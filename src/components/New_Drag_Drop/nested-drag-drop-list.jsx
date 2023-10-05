@@ -5,7 +5,7 @@ import Title from "./premitive/title";
 import styled from "@emotion/styled";
 import { colors } from "@atlaskit/theme";
 
-const NestedDragList = ({ list }) => {
+const NestedDragList = ({ list, order }) => {
   const renderQuote = (quote, index) => (
     <Draggable key={quote.id} draggableId={quote.id} index={index}>
       {(provided, snapshot) => (
@@ -21,7 +21,7 @@ const NestedDragList = ({ list }) => {
   const renderList = (list, level) => {
     // console.log("List data", list);
     return (
-      <Droppable droppableId={list.id} type={list.id} key={list.id}>
+      <Droppable droppableId={list.id} type={list.type} key={list.id}>
         {(dropProvided, dropSnapshot) => (
           <Container
             ref={dropProvided.innerRef}
@@ -54,7 +54,8 @@ const NestedDragList = ({ list }) => {
     );
   };
 
-  return <Root>{renderList(list)}</Root>;
+  return <Root>{renderList(list, 1)}</Root>;
+  // return renderList(list, 1);
 };
 
 export default NestedDragList;
@@ -76,6 +77,7 @@ const Container = styled.div`
   padding-bottom: 0;
   user-select: none;
   transition: background-color 0.1s ease;
+  // overflow-y: auto;
 
   &:focus {
     outline: 2px solid ${colors.P200};
