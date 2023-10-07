@@ -96,3 +96,25 @@ export function moveBetween({ list1, list2, source, destination }) {
     },
   };
 }
+
+export const copy = (
+  source,
+  destination,
+  droppableSource,
+  droppableDestination
+) => {
+  const sourceClone = Array.from(source);
+  const destClone = Array.from(destination);
+  const itemToCopy = sourceClone[droppableSource.index];
+
+  // Create a copy of the item (you may need to implement a deep copy if the item is complex)
+  const copiedItem = { ...itemToCopy };
+
+  destClone.splice(droppableDestination.index, 0, copiedItem);
+
+  const result = {};
+  result[droppableSource.droppableId] = sourceClone;
+  result[droppableDestination.droppableId] = destClone;
+
+  return result;
+};

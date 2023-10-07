@@ -80,6 +80,8 @@ const Root = styled.div`
 const NestedDragApp = () => {
   const [list, setList] = useState(initialList);
   const [list2, setList2] = useState(initialList2);
+
+  const [state, setState] = useState([initialList, initialList2]);
   const [order, setOrder] = useState([
     { id: "left", title: "Left Container" },
     { id: "right", title: "Right Container" },
@@ -106,11 +108,17 @@ const NestedDragApp = () => {
   }
 
   const onDragEnd = (result) => {
-    console.log("result", result);
+    const { source, destination } = result;
+    console.log("result", state);
     // dropped outside the list
     if (!result.destination) {
       return;
     }
+
+    const sInd = source.droppableId;
+    const dInd = destination.droppableId;
+
+    console.log("ids", sInd, dInd);
 
     if (result.type === "level-1") {
       if (result.destination.droppableId === "first-level2") {
@@ -192,26 +200,13 @@ const NestedDragApp = () => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       {/* <Root>
-        <Droppable droppableId="list1" type="COLUMN" key={"lsit1"}>
-          {(provided, snapshot) => (
-            // Render your first list here
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              <NestedDragList key={"left"} index={"L1"} list={list} />
-            </div>
-          )}
-        </Droppable>
-        <Droppable droppableId="list2" type="COLUMN" key={list2}>
-          {(provided, snapshot) => (
-            // Render your second list here
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              <NestedDragList key={"right"} index={"R1"} list={list2} />
-            </div>
-          )}
-        </Droppable>
-      </Root> */}
-      <Root>
         <NestedDragList list={list} />
         <NestedDragList list={list2} />
+      </Root> */}
+      <Root>
+        {state.map((item, index) => (
+          <NestedDragList key={index} list={item} />
+        ))}
       </Root>
     </DragDropContext>
   );
