@@ -6,7 +6,7 @@ import { colors } from "@atlaskit/theme";
 
 import { getQuotes } from "./data";
 import NestedDragList from "./nested-drag-drop-list";
-import reorder from "./reorder";
+import reorder, { copy, findChildrenById, updateObject } from "./reorder";
 import { invariant } from "./invariant";
 import { Container } from "@mui/material";
 
@@ -108,8 +108,9 @@ const NestedDragApp = () => {
   }
 
   const onDragEnd = (result) => {
-    const { source, destination } = result;
-    console.log("result", state);
+    const { source, destination, type } = result;
+    console.log("sate", state);
+    console.log("result", source, destination, type);
     // dropped outside the list
     if (!result.destination) {
       return;
@@ -118,84 +119,141 @@ const NestedDragApp = () => {
     const sInd = source.droppableId;
     const dInd = destination.droppableId;
 
-    console.log("ids", sInd, dInd);
-
-    if (result.type === "level-1") {
-      if (result.destination.droppableId === "first-level2") {
-        console.log("drop in next list");
-
-        const newItem = findItemById(list.children, result.draggableId);
-        console.log(newItem, list2);
-        // setList2((prev) => [...prev, newItem]);
-        setList2((prev) => ({
-          children: [...prev.children, newItem],
-          ...prev,
-        }));
+    if (sInd !== dInd) {
+      if (type === "level-1") {
+        //! 1st level
+        console.log("res", source, destination);
+        const list1 = state[0].children;
+        const list2 = state[1].children;
+        const [sourceclone, destClone, copiedItem] = copy(
+          list1,
+          list2,
+          source,
+          destination
+        );
+        const newList0 = {
+          ...state[0],
+          children: sourceclone,
+        };
+        const newList1 = {
+          ...state[1],
+          children: destClone,
+        };
+        console.log("result array", sourceclone, destClone, copiedItem);
+        const LIST = [...state];
+        LIST[0] = newList0;
+        LIST[1] = newList1;
+        setState(LIST);
         return;
       }
-      const children = reorder(
-        list?.children,
-        result.source.index,
-        result.destination.index
-      );
 
-      const List = {
-        ...list,
-        children,
-      };
+      if (type === "level-2") {
+        const childrenList1 = findChildrenById(state[0], "second-level");
+        const childrenList2 = findChildrenById(state[1], "second-level2");
 
-      setList(List);
-      return;
+        console.log("leve - 2 data", childrenList1, childrenList2);
+
+        const [sourcecloneChildren, destCloneChildren, copiedItem] = copy(
+          childrenList1,
+          childrenList2,
+          source,
+          destination
+        );
+
+        const newChildrenList1 = updateObject(
+          state[0],
+          "second-level",
+          sourcecloneChildren
+        );
+
+        const newChildrenList2 = updateObject(
+          state[1],
+          "second-level2",
+          destCloneChildren
+        );
+
+        const LISTL1 = [...state];
+        LISTL1[0] = newChildrenList1;
+        LISTL1[1] = newChildrenList2;
+        setState(LISTL1);
+        return;
+      }
+
+      if (type === "level-3") {
+        console.log("type", type);
+        const nestedChildrenList1 = findChildrenById(state[0], "third-level");
+        const nestedChildrenList2 = findChildrenById(state[1], "third-level2");
+
+        const [sourcecloneNestedChildren, destCloneNestedChildren, copiedItem] =
+          copy(nestedChildrenList1, nestedChildrenList2, source, destination);
+
+        const newNestedList1 = updateObject(
+          state[0],
+          "third-level",
+          sourcecloneNestedChildren
+        );
+        const newNestedList2 = updateObject(
+          state[1],
+          "third-level2",
+          destCloneNestedChildren
+        );
+
+        const LISTL1 = [...state];
+        LISTL1[0] = newNestedList1;
+        LISTL1[1] = newNestedList2;
+        setState(LISTL1);
+        return;
+      }
     }
+
+    // if (result.type === "level-1") {
+    //   const children = reorder(
+    //     list?.children,
+    //     result.source.index,
+    //     result.destination.index
+    //   );
+
+    //   const List = {
+    //     ...list,
+    //     children,
+    //   };
+
+    //   setList(List);
+    //   return;
+    // }
     // else if (result.type === "level-1" && result.droppableId === "first-level2") {
 
     // }
 
-    if (result.type === "level-2") {
-      const nested = list.children.filter((item) =>
-        Object.prototype.hasOwnProperty.call(item, "children")
-      )[0];
+    // if (result.type === "level-2") {
+    //   const nested = list.children.filter((item) =>
+    //     Object.prototype.hasOwnProperty.call(item, "children")
+    //   )[0];
 
-      invariant(nested, "could not find nested list");
+    //   invariant(nested, "could not find nested list");
 
-      const updated = {
-        ...nested,
-        children: reorder(
-          nested.children,
-          result.source.index,
-          // $ExpectError - already checked for null
-          result.destination.index
-        ),
-      };
+    //   const updated = {
+    //     ...nested,
+    //     children: reorder(
+    //       nested.children,
+    //       result.source.index,
+    //       // $ExpectError - already checked for null
+    //       result.destination.index
+    //     ),
+    //   };
 
-      const nestedIndex = list.children.indexOf(nested);
-      const children = Array.from(list.children);
-      children[nestedIndex] = updated;
+    //   const nestedIndex = list.children.indexOf(nested);
+    //   const children = Array.from(list.children);
+    //   children[nestedIndex] = updated;
 
-      const List = {
-        list,
-        children,
-      };
+    //   const List = {
+    //     list,
+    //     children,
+    //   };
 
-      setList(List);
-    }
+    //   setList(List);
+    // }
   };
-
-  const board = () => (
-    <Droppable droppableId={"board"} type="COLUMN" direction="horizontal">
-      {(provided) => (
-        <Root ref={provided.innerRef} {...provided.droppableProps}>
-          {order.map((key, index) => (
-            <NestedDragList
-              key={key}
-              index={index}
-              list={index === 0 ? list : list2}
-            />
-          ))}
-        </Root>
-      )}
-    </Droppable>
-  );
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -205,7 +263,12 @@ const NestedDragApp = () => {
       </Root> */}
       <Root>
         {state.map((item, index) => (
-          <NestedDragList key={index} list={item} />
+          <NestedDragList
+            key={index}
+            list={item}
+            isDrop={index == 0 && true}
+            draggable={index === 1 && true}
+          />
         ))}
       </Root>
     </DragDropContext>

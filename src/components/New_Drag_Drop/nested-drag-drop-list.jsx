@@ -4,24 +4,42 @@ import QuoteItem from "./premitive/quote-item";
 import Title from "./premitive/title";
 import styled from "@emotion/styled";
 import { colors } from "@atlaskit/theme";
+import CLoneQuoteItem from "./premitive/clone-quote-item";
 
-const NestedDragList = ({ list, order }) => {
+const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
   const renderQuote = (quote, index) => (
-    <Draggable key={quote.id} draggableId={quote.id} index={index}>
+    <Draggable
+      isDragDisabled={draggable}
+      key={quote.id}
+      draggableId={quote.id}
+      index={index}
+    >
       {(provided, snapshot) => (
-        <QuoteItem
-          quote={quote}
-          isDragging={snapshot.isDragging}
-          provided={provided}
-        />
+        <>
+          <QuoteItem
+            quote={quote}
+            isDragging={snapshot.isDragging}
+            provided={provided}
+          />
+          {snapshot.isDragging && <CLoneQuoteItem quote={quote} />}
+        </>
       )}
     </Draggable>
   );
 
-  const renderList = (list, level) => {
+  const cloneRenderList = (list, level) => {
+    return <Title>{list.title}</Title>;
+  };
+
+  const renderList = (list, level, isDrop, draggable) => {
     // console.log("List data", list);
     return (
-      <Droppable droppableId={list.id} type={list.type} key={list.id}>
+      <Droppable
+        droppableId={list.id}
+        type={list.type}
+        key={list.id}
+        isDropDisabled={isDrop}
+      >
         {(dropProvided, dropSnapshot) => (
           <Container
             ref={dropProvided.innerRef}
@@ -33,16 +51,24 @@ const NestedDragList = ({ list, order }) => {
               !item.children ? (
                 renderQuote(item, index)
               ) : (
-                <Draggable draggableId={item.id} key={item.id} index={index}>
+                <Draggable
+                  isDragDisabled={draggable}
+                  draggableId={item.id}
+                  key={item.id}
+                  index={index}
+                >
                   {(dragProvided, dragSnapshot) => (
-                    <NestedContainer
-                      ref={dragProvided.innerRef}
-                      isDragging={dragSnapshot.isDragging}
-                      {...dragProvided.draggableProps}
-                      {...dragProvided.dragHandleProps}
-                    >
-                      {renderList(item, level + 1)}
-                    </NestedContainer>
+                    <>
+                      <NestedContainer
+                        ref={dragProvided.innerRef}
+                        isDragging={dragSnapshot.isDragging}
+                        {...dragProvided.draggableProps}
+                        {...dragProvided.dragHandleProps}
+                      >
+                        {renderList(item, level + 1, isDrop, draggable)}
+                      </NestedContainer>
+                      {dragSnapshot.isDragging && <div>Hello LIST</div>}
+                    </>
                   )}
                 </Draggable>
               )
@@ -54,7 +80,7 @@ const NestedDragList = ({ list, order }) => {
     );
   };
 
-  return <Root>{renderList(list, 1)}</Root>;
+  return <Root>{renderList(list, 1, isDrop, draggable)}</Root>;
   // return renderList(list, 1);
 };
 
@@ -67,6 +93,8 @@ const Root = styled.div`
   max-height: 100vh;
   overflow-y: auto; /* Enable vertical scrolling */
 `;
+
+const CloneContainer = styled.div``;
 
 const Container = styled.div`
   background-color: ${({ isDraggingOver }) =>

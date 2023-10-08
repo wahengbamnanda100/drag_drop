@@ -97,6 +97,36 @@ export function moveBetween({ list1, list2, source, destination }) {
   };
 }
 
+// function updateIdsRecursively(item) {
+//   if (item.children) {
+//     item.children = item.children.map((child) => ({
+//       ...child,
+//       id: `${child.id}-${Date.now()}`,
+//     }));
+
+//     // Recursively update ids in nested children arrays
+//     item.children.forEach((child) => {
+//       updateIdsRecursively(child);
+//     });
+//   }
+
+//   return item;
+// }
+
+function generateUniqueId() {
+  return `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+}
+
+function updateIdsRecursively(obj) {
+  const newObj = { ...obj, id: generateUniqueId() };
+  if (newObj.children && newObj.children.length > 0) {
+    newObj.children = newObj.children.map((child) =>
+      updateIdsRecursively(child)
+    );
+  }
+  return newObj;
+}
+
 export const copy = (
   source,
   destination,
@@ -107,14 +137,101 @@ export const copy = (
   const destClone = Array.from(destination);
   const itemToCopy = sourceClone[droppableSource.index];
 
-  // Create a copy of the item (you may need to implement a deep copy if the item is complex)
-  const copiedItem = { ...itemToCopy };
+  // Check if itemToCopy already exists in the destination array
+  console.log("to cop item", itemToCopy);
+  // const alreadyExists = destClone.some(
+  //   (item) => item.content === itemToCopy.content
+  // ); //? change is later
 
-  destClone.splice(droppableDestination.index, 0, copiedItem);
+  const alreadyExists = destClone.some((item) => {
+    if (itemToCopy.children) {
+      // If itemToCopy has children property, compare it with item.title
+      return item.title === itemToCopy.title;
+    } else {
+      // Otherwise, compare content
+      return item.content === itemToCopy.content;
+    }
+  });
 
-  const result = {};
-  result[droppableSource.droppableId] = sourceClone;
-  result[droppableDestination.droppableId] = destClone;
+  if (!alreadyExists) {
+    console.log("not exist item", itemToCopy);
+    // Create a copy of the item
+    // const copiedItem = { ...itemToCopy, id: `${itemToCopy.id}-${Date.now()}` };
 
-  return result;
+    // const copiedItem = itemToCopy.children
+    //   ? updateIdsRecursively(itemToCopy)
+    //   : { ...itemToCopy, id: `${itemToCopy.id}-${Date.now()}` };
+
+    // let copiedItem;
+
+    // if (itemToCopy.children) {
+    //   console.log("2nd child", itemToCopy.children);
+    //   copiedItem = {
+    //     ...itemToCopy,
+    //     children: itemToCopy.children.map((child) => {
+    //       if (child.children) {
+
+    //       }
+    //       return {
+    //         ...child,
+    //         id: `${child.id}-${Date.now()}`,
+    //       };
+    //     }),
+    //   };
+    // } else {
+    //   copiedItem = { ...itemToCopy, id: `${itemToCopy.id}-${Date.now()}` };
+    // }
+
+    const copiedItem = updateIdsRecursively(itemToCopy);
+
+    console.log("copied item", copiedItem);
+    // Insert the copied item into the destination array
+    destClone.splice(droppableDestination.index, 0, copiedItem);
+
+    return [sourceClone, destClone, copiedItem];
+  } else {
+    // Item already exists in the destination, return the original arrays
+    return [sourceClone, destClone, itemToCopy];
+  }
 };
+
+export function updateObject(obj, targetId, newArray) {
+  // If the current object's id matches the targetId, return a new object with the updated children array
+  if (obj.id === targetId) {
+    return { ...obj, children: newArray };
+  }
+
+  // If the current object does not match the targetId, check if it has a "children" property
+  if (obj.children) {
+    const updatedChildren = obj.children.map((child) =>
+      updateObject(child, targetId, newArray)
+    );
+
+    // Return a new object with the updated children (if any)
+    return { ...obj, children: updatedChildren };
+  }
+
+  // If the current object does not have a "children" property, return the object as is
+  return obj;
+}
+
+export function findChildrenById(obj, targetId) {
+  // Check if the current object's id matches the targetId
+  if (obj.id === targetId) {
+    return obj.children; // Return the children array of the matched object
+  }
+
+  // Check if the current object has a "children" property
+  if (obj.children && Array.isArray(obj.children)) {
+    // If the current object doesn't match the targetId, recursively search in its children
+    for (const child of obj.children) {
+      const result = findChildrenById(child, targetId);
+      if (result) {
+        return result; // Return the result if found in children
+      }
+    }
+  }
+
+  // If not found, return null
+  return null;
+}
