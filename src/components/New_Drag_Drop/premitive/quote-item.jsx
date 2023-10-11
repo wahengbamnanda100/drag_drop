@@ -169,7 +169,7 @@ function getStyle(provided, style) {
 function QuoteItem(props) {
   const { quote, isDragging, isGroupedOver, provided, style, isClone, index } =
     props;
-
+  console.log("Quote", quote);
   return (
     <Container
       href={quote.author.url}

@@ -1,88 +1,23 @@
-// import { Container, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import styled from "@emotion/styled";
 import { colors } from "@atlaskit/theme";
 
-import { getQuotes } from "./data";
-import NestedDragList from "./nested-drag-drop-list";
+// import { getQuotes } from "./data";
+// import NestedDragList from "./nested-drag-drop-list";
 import reorder, {
   convertToDndObject,
   copy,
   findChildrenById,
   updateObject,
-} from "./reorder";
-import jsonData from "../../utils/treeData.json";
+} from "../reorder";
+import jsonData from "../../../utils/treeData.json";
 import _ from "lodash";
-
-const quotes = getQuotes(12);
-const quotes2 = getQuotes(10);
+import NestedDragList from "./primitive/certification-dnd-list";
 
 const grid = 8;
 
-const initialList = {
-  id: "first-level",
-  type: "level-1",
-  title: "top level",
-  children: [
-    ...quotes.slice(0, 2),
-    {
-      id: "second-level",
-      type: "level-2",
-      title: "second level",
-      children: [
-        ...quotes.slice(3, 7),
-        {
-          id: "third-level",
-          type: "level-3",
-          title: "third level",
-          children: quotes.slice(8, 9),
-        },
-      ],
-    },
-    ...quotes.slice(9, 11),
-  ],
-};
-
-const initialList2 = {
-  id: "first-level2",
-  type: "level-1",
-  title: "top level2",
-  children: [
-    ...quotes2.slice(0, 1),
-    {
-      id: "second-level2",
-      type: "level-2",
-      title: "second level2",
-      children: [
-        ...quotes2.slice(1, 3),
-        {
-          id: "third-level2",
-          type: "level-3",
-          title: "third level2",
-          children: quotes2.slice(4, 5),
-        },
-      ],
-    },
-    // ...quotes2.slice(6, 9),
-  ],
-};
-
-const Root = styled.div`
-  background-color: ${colors.B200};
-  box-sizing: border-box;
-  padding: ${grid * 2}px;
-  min-height: 100vh;
-  overflow-y: auto;
-
-  /* flexbox */
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  align-items: flex-start;
-`;
-
-function coverttoNestedObject(inputObject) {
+function coverttoNestedObject(inputObject, type) {
   let resChildren = [];
   let level = 0;
   const firstLevelKey = Object.keys(inputObject);
@@ -102,7 +37,8 @@ function coverttoNestedObject(inputObject) {
         let responseChlidren = responseChildrenKeys.map(
           (innerMostKeys, index) => {
             return {
-              id: `${innerMostKeys}-${Date.now()}`,
+              key: innerMostKeys,
+              id: `${innerMostKeys}-${type}`,
               type: innerMostKeys,
               title: innerMostKeys,
               level_id: `${innerMostKeys}-${level + 3}`,
@@ -116,7 +52,7 @@ function coverttoNestedObject(inputObject) {
         );
 
         let res = {
-          id: `${innerKey}-${Date.now()}`,
+          id: `${innerKey}-${type}`,
           type: innerKey,
           title: innerKey,
           level_id: `${innerKey}-${level + 2}`,
@@ -130,7 +66,9 @@ function coverttoNestedObject(inputObject) {
 
         let resParmasChildren = paramsChildren.map((paramKey, index) => {
           return {
-            id: `${paramKey["$ref"]}-${Date.now()}`,
+            key: paramKey,
+            // id: `${paramKey["$ref"]}-${Date.now()}`,
+            id: `${paramKey["$ref"]}-${type}`,
             type: paramKey["$ref"],
             title: paramKey["$ref"],
             level_id: `${paramKey["$ref"]}-${level + 3}`,
@@ -140,7 +78,9 @@ function coverttoNestedObject(inputObject) {
         });
 
         let params = {
-          id: `${innerKey}-${Date.now()}`,
+          //   id: `${innerKey}-${Date.now()}`,
+          key: innerKey,
+          id: `${innerKey}-${type}`,
           type: innerKey,
           title: innerKey,
           level_id: `${innerKey}-${level + 2}`,
@@ -157,19 +97,21 @@ function coverttoNestedObject(inputObject) {
     const filteredSecondChildren = secondChildren.filter(
       (item) => item !== null
     );
-
+    console.log("🚀🚀", filteredSecondChildren.flat());
+    const resultSecondChildren = filteredSecondChildren.flat();
     return {
-      id: `${key}-${Date.now()}`,
+      key: key,
+      id: `${key}-${type}`,
       type: key,
       title: key,
       level_id: `${key}-${level + 1}`,
       subTitle: inputObject[firstLevelKey[0]][key][subKey[0]],
-      children: [...filteredSecondChildren],
+      children: [...resultSecondChildren],
     };
   });
 
   let result = {
-    id: `${firstLevelKey[0]}-${Date.now()}`, //add more random vlaue
+    id: `${firstLevelKey[0]}-${type}`, //add more random vlaue
     type: firstLevelKey[0], //inputObject key 1st level
     title: firstLevelKey[0], //inputObject key 1st level
     level_id: `${firstLevelKey[0]}-${level}`, //unique id
@@ -180,43 +122,26 @@ function coverttoNestedObject(inputObject) {
   return result;
 }
 
-const inputObject = {
-  path: {
-    "/item1": {
-      post: {
-        tags: ["CR - ProductDirectoryEntry"],
-        summary: "InCR Register a new product or service in the catalog",
-        description: "InCR Register a new product or service in the catalog",
-        operationId: "Register",
-        requestBody: {
-          $ref: "#/components/requestBodies/ProductDirectoryEntry",
-        },
-        responses: {
-          200: {
-            $ref: "#/components/responses/ProductDirectoryEntry",
-          },
-          400: {
-            $ref: "#/components/responses/BadRequest",
-          },
-          401: {
-            $ref: "#/components/responses/Unauthorized",
-          },
-        },
-      },
-    },
-  },
-};
+const Root = styled.div`
+  background-color: ${colors.B200};
+  box-sizing: border-box;
+  padding: ${grid * 2}px;
+  min-height: 100vh;
+  overflow-y: auto;
 
-const NestedDragApp = () => {
+  /* flexbox */
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+`;
+
+const initialList = coverttoNestedObject(jsonData, 1);
+console.log("🤣", initialList);
+const initialList2 = coverttoNestedObject(jsonData, 2);
+
+const CertificationDndAPP = () => {
   const [state, setState] = useState([initialList, initialList2]);
-
-  console.log("Tree data", Object.keys(jsonData));
-
-  const transformedObject = coverttoNestedObject(jsonData);
-
-  console.log("transform obj", transformedObject);
-  console.log("State obj", state);
-  // console.log("transform obj", JSON.stringify(transformedObject, null, 2));
 
   const onDragEnd = (result) => {
     const { source, destination, type } = result;
@@ -366,18 +291,16 @@ const NestedDragApp = () => {
     // }
   };
 
+  console.log("Certification data", state);
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      {/* <Root>
-        <NestedDragList list={list} />
-        <NestedDragList list={list2} />
-      </Root> */}
       <Root>
         {state.map((item, index) => (
           <NestedDragList
             key={index}
             list={item}
-            isDrop={index == 0 && true}
+            isDrop={index === 0 && true}
             draggable={index === 1 && true}
           />
         ))}
@@ -386,4 +309,4 @@ const NestedDragApp = () => {
   );
 };
 
-export default NestedDragApp;
+export default CertificationDndAPP;

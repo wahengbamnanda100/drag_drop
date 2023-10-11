@@ -235,3 +235,85 @@ export function findChildrenById(obj, targetId) {
   // If not found, return null
   return null;
 }
+
+//!___________________________________
+
+export function convertToDndObject(inputObject) {
+  const firstLevelKey = Object.keys(inputObject)[0];
+  const topLevel = inputObject[firstLevelKey];
+
+  const result = {
+    id: `${firstLevelKey}-${Date.now()}`,
+    type: firstLevelKey,
+    title: firstLevelKey,
+    level_id: `${firstLevelKey}-${0}`,
+    subTitle: "lorem ipsum lorem ipsum",
+    children: processSecondLevel(topLevel),
+  };
+
+  return result;
+}
+
+function processSecondLevel(secondLevel) {
+  return Object.keys(secondLevel).map((key) => {
+    const subKey = secondLevel[key];
+    return {
+      id: `${key}-${Date.now()}`,
+      type: key,
+      title: key,
+      level_id: `${key}-${1}`,
+      subTitle: subKey.summary,
+      children: processThirdLevel(subKey),
+    };
+  });
+}
+
+function processThirdLevel(thirdLevel) {
+  return Object.keys(thirdLevel)
+    .map((innerKey) => {
+      if (innerKey === "responses") {
+        const responseChildren = processResponses(thirdLevel[innerKey]);
+        return {
+          id: `${innerKey}-${Date.now()}`,
+          type: innerKey,
+          title: innerKey,
+          level_id: `${innerKey}-${2}`,
+          subTitle: "",
+          children: responseChildren,
+        };
+      } else if (innerKey === "parameters") {
+        const paramsChildren = processParameters(thirdLevel[innerKey]);
+        return {
+          id: `${innerKey}-${Date.now()}`,
+          type: innerKey,
+          title: innerKey,
+          level_id: `${innerKey}-${2}`,
+          subTitle: "",
+          children: paramsChildren,
+        };
+      }
+    })
+    .filter(Boolean);
+}
+
+function processResponses(responses) {
+  return Object.keys(responses).map((innerMostKeys) => ({
+    id: `${innerMostKeys}-${Date.now()}`,
+    type: innerMostKeys,
+    title: innerMostKeys,
+    level_id: `${innerMostKeys}-${3}`,
+    subTitle: responses[innerMostKeys],
+    resType: "string",
+  }));
+}
+
+function processParameters(parameters) {
+  return parameters.map((paramKey) => ({
+    id: `${paramKey["$ref"]}-${Date.now()}`,
+    type: paramKey["$ref"],
+    title: paramKey["$ref"],
+    level_id: `${paramKey["$ref"]}-${3}`,
+    subTitle: "",
+    resType: "string",
+  }));
+}

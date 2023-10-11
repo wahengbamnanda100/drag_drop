@@ -1,34 +1,35 @@
 import React from "react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
-import QuoteItem from "./premitive/quote-item";
-import Title from "./premitive/title";
+// import QuoteItem from "./premitive/quote-item";
+import Title from "../../premitive/title";
 import styled from "@emotion/styled";
 import { colors } from "@atlaskit/theme";
-import CLoneQuoteItem from "./premitive/clone-quote-item";
+// import CLoneQuoteItem from "./premitive/clone-quote-item";
+import MenuItem from "./MenuItem";
 
 const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
-  const renderQuote = (quote, index) => (
+  const renderQuote = (data, index) => (
     <Draggable
       isDragDisabled={draggable}
-      key={quote.id}
-      draggableId={quote.id}
+      key={data.id}
+      draggableId={data.id}
       index={index}
     >
       {(provided, snapshot) => (
         <>
-          <QuoteItem
-            quote={quote}
+          <MenuItem
+            data={data}
             isDragging={snapshot.isDragging}
             provided={provided}
           />
-          {snapshot.isDragging && <CLoneQuoteItem quote={quote} />}
+          {/* {snapshot.isDragging && <CLoneQuoteItem quote={quote} />} */}
         </>
       )}
     </Draggable>
   );
 
   const cloneRenderList = (list, level) => {
-    return <Title>{list.title}</Title>;
+    return <h5>{list.title}</h5>;
   };
 
   const renderList = (list, level, isDrop, draggable) => {
@@ -47,7 +48,6 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
             {...dropProvided.droppableProps}
           >
             <Title>{list.title}</Title>
-            {console.log("isnide quote", list)}
             {list.children.map((item, index) =>
               !item.children ? (
                 renderQuote(item, index)
@@ -80,9 +80,7 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
       </Droppable>
     );
   };
-
   return <Root>{renderList(list, 1, isDrop, draggable)}</Root>;
-  // return renderList(list, 1);
 };
 
 export default NestedDragList;
@@ -94,8 +92,6 @@ const Root = styled.div`
   max-height: 100vh;
   overflow-y: auto; /* Enable vertical scrolling */
 `;
-
-const CloneContainer = styled.div``;
 
 const Container = styled.div`
   background-color: ${({ isDraggingOver }) =>

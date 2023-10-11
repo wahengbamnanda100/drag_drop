@@ -6,6 +6,7 @@ import NotFound from "./components/NotFound";
 import DragAndDrop from "./components/Drag_and_drop";
 import DataMapping from "./components/Data_Mapping";
 import NestedDragApp from "./components/New_Drag_Drop/nested-drap-app";
+import CertificationDndAPP from "./components/New_Drag_Drop/examples/certification-dnd-app";
 
 function App() {
   return (
@@ -22,7 +23,8 @@ function App() {
           <Route path="/" element={<MainLayout />} />
           <Route path="/dragdrop" element={<DragAndDrop />} />
           <Route path="/datamapping" element={<DataMapping />} />
-          <Route path="/newdragdrop" element={<NestedDragApp />} />
+          {/* <Route path="/newdragdrop" element={<NestedDragApp />} /> */}
+          <Route path="/newdragdrop" element={<CertificationDndAPP />} />
           <Route path="*" element={<NotFound />} />
           <Route />
         </Routes>
