@@ -23,8 +23,8 @@ function App() {
           <Route path="/" element={<MainLayout />} />
           <Route path="/dragdrop" element={<DragAndDrop />} />
           <Route path="/datamapping" element={<DataMapping />} />
-          {/* <Route path="/newdragdrop" element={<NestedDragApp />} /> */}
-          <Route path="/newdragdrop" element={<CertificationDndAPP />} />
+          <Route path="/newdragdrop" element={<NestedDragApp />} />
+          <Route path="/newnewdragdrop" element={<CertificationDndAPP />} />
           <Route path="*" element={<NotFound />} />
           <Route />
         </Routes>

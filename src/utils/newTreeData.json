@@ -1,63 +1,5 @@
 {
   "paths": {
-    "/ProductDirectory/Register": {
-      "post": {
-        "tags": ["CR - ProductDirectoryEntry"],
-        "summary": "InCR Register a new product or service in the catalog",
-        "description": "InCR Register a new product or service in the catalog",
-        "operationId": "Register",
-        "requestBody": {
-          "$ref": "#/components/requestBodies/ProductDirectoryEntry"
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/ProductDirectoryEntry"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          }
-        }
-      }
-    },
-    "/ProductDirectory/{productdirectoryid}/Update": {
-      "put": {
-        "tags": ["CR - ProductDirectoryEntry"],
-        "summary": "UpCR Update details of a product or service in the catalog",
-        "description": "UpCR Update details of a product or service in the catalog",
-        "operationId": "Update",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/productdirectoryid"
-          }
-        ],
-        "requestBody": {
-          "$ref": "#/components/requestBodies/ProductDirectoryEntry"
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/ProductDirectoryEntry"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/TooManyRequests"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
-          }
-        }
-      }
-    },
     "/ProductDirectory/{productdirectoryid}/Request": {
       "put": {
         "tags": ["CR - ProductDirectoryEntry"],
@@ -71,11 +13,6 @@
         ],
         "requestBody": {
           "$ref": "#/components/requestBodies/ProductDirectoryEntry"
-        },
-        "responses": {
-          "200": {
-            "$ref": "#/components/responses/ProductDirectoryEntry"
-          }
         }
       }
     },
@@ -99,18 +36,6 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/TooManyRequests"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -121,38 +46,12 @@
         "summary": "InBQ Register a new product or service operations details in the catalog",
         "description": "InBQ Register a new product or service operations details in the catalog",
         "operationId": "RegisterOperations",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/productdirectoryid"
-          },
-          {
-            "$ref": "#/components/parameters/operationsid"
-          }
-        ],
         "requestBody": {
           "$ref": "#/components/requestBodies/RegisterOperationsRequest"
         },
         "responses": {
           "200": {
             "$ref": "#/components/responses/RegisterOperationsRequest"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "429": {
-            "$ref": "#/components/responses/TooManyRequests"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalServerError"
           }
         }
       }
@@ -163,14 +62,7 @@
         "summary": "UpBQ Update details of a product or service operations details in the catalog",
         "description": "UpBQ Update details of a product or service operations details in the catalog",
         "operationId": "UpdateOperations",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/productdirectoryid"
-          },
-          {
-            "$ref": "#/components/parameters/operationsid"
-          }
-        ],
+
         "requestBody": {
           "$ref": "#/components/requestBodies/UpdateOperationsRequest"
         },

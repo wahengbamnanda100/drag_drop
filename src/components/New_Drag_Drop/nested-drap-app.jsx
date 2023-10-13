@@ -210,20 +210,16 @@ const inputObject = {
 const NestedDragApp = () => {
   const [state, setState] = useState([initialList, initialList2]);
 
-  console.log("Tree data", Object.keys(jsonData));
-
-  const transformedObject = coverttoNestedObject(jsonData);
-
-  console.log("transform obj", transformedObject);
   console.log("State obj", state);
   // console.log("transform obj", JSON.stringify(transformedObject, null, 2));
 
   const onDragEnd = (result) => {
     const { source, destination, type } = result;
-    console.log("sate", state);
-    console.log("result", source, destination, type);
+    console.log("sate", state, result);
+    console.log("result", type);
     // dropped outside the list
     if (!result.destination) {
+      console.log("there is no destination");
       return;
     }
 
@@ -262,7 +258,7 @@ const NestedDragApp = () => {
         const childrenList1 = findChildrenById(state[0], "second-level");
         const childrenList2 = findChildrenById(state[1], "second-level2");
 
-        console.log("leve - 2 data", childrenList1, childrenList2);
+        console.log("leve - 2 data 🖍️🖍️🖍️", childrenList1, childrenList2);
 
         const [sourcecloneChildren, destCloneChildren, copiedItem] = copy(
           childrenList1,

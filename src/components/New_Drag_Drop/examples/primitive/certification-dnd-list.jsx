@@ -6,6 +6,7 @@ import styled from "@emotion/styled";
 import { colors } from "@atlaskit/theme";
 // import CLoneQuoteItem from "./premitive/clone-quote-item";
 import MenuItem from "./MenuItem";
+import { Box, Typography } from "@mui/material";
 
 const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
   const renderQuote = (data, index) => (
@@ -47,7 +48,20 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
             isDraggingOver={dropSnapshot.isDraggingOver}
             {...dropProvided.droppableProps}
           >
-            <Title>{list.title}</Title>
+            <Box sx={{ width: "100%" }}>
+              <Typography
+                variant="body1"
+                fontWeight={"medium"}
+                sx={{
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  width: "100%",
+                  pb: "10px",
+                }}
+              >
+                {list.title}
+              </Typography>
+            </Box>
             {list.children.map((item, index) =>
               !item.children ? (
                 renderQuote(item, index)
@@ -101,6 +115,7 @@ const Container = styled.div`
   padding: ${grid}px;
   padding-bottom: 0;
   user-select: none;
+  overflow-x: hidden;
   transition: background-color 0.1s ease;
   // overflow-y: auto;
 

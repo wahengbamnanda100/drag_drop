@@ -133,60 +133,47 @@ export const copy = (
       return item.title === itemToCopy.title;
     } else {
       // Otherwise, compare content
-      return item.content === itemToCopy.content;
+      return item.level_id === itemToCopy.level_id;
     }
   });
 
   if (!alreadyExists) {
-    // console.log("not exist item", itemToCopy);
-    // Create a copy of the item
-    // const copiedItem = { ...itemToCopy, id: `${itemToCopy.id}-${Date.now()}` };
-
-    // const copiedItem = itemToCopy.children
-    //   ? updateIdsRecursively(itemToCopy)
-    //   : { ...itemToCopy, id: `${itemToCopy.id}-${Date.now()}` };
-
-    // let copiedItem;
-
-    // if (itemToCopy.children) {
-    //   console.log("2nd child", itemToCopy.children);
-    //   copiedItem = {
-    //     ...itemToCopy,
-    //     children: itemToCopy.children.map((child) => {
-    //       if (child.children) {
-
-    //       }
-    //       return {
-    //         ...child,
-    //         id: `${child.id}-${Date.now()}`,
-    //       };
-    //     }),
-    //   };
-    // } else {
-    //   copiedItem = { ...itemToCopy, id: `${itemToCopy.id}-${Date.now()}` };
-    // }
-
     const copiedItem = updateIdsRecursively(itemToCopy);
 
-    console.log("copied item", copiedItem);
+    console.log("copied item 📜📜📜📜📜", copiedItem);
     // Insert the copied item into the destination array
     destClone.splice(droppableDestination.index, 0, copiedItem);
 
     return [sourceClone, destClone, copiedItem];
   } else {
+    console.log("🌍🌍🌍", itemToCopy);
     // Item already exists in the destination, return the original arrays
     return [sourceClone, destClone, itemToCopy];
   }
 };
 
-export function updateObject(obj, targetId, newArray) {
+export function updateObject(obj, targetId, newArray, result) {
   // If the current object's id matches the targetId, return a new object with the updated children array
-  if (obj.id === targetId) {
+  const _id = obj.id.split("__");
+  if (`${_id[1]}__${_id[2]}` === targetId) {
+    console.log(
+      "Split id update Obj 🤷‍♂️🤷‍♂️🤷‍♂️",
+      obj,
+      newArray,
+      targetId,
+      _id[1],
+      _id[2]
+    );
+    console.log("🪢🪢🪢", targetId, "🎉✨🎉", ` ${_id[1]}__${_id[2]}`);
+    console.log("🚀🚀🚀🚀", result);
+    console.log("🎯🎯🎯", obj);
     return { ...obj, children: newArray };
   }
 
   // If the current object does not match the targetId, check if it has a "children" property
   if (obj.children) {
+    console.log("🚩🚩🚩 ⛔⛔⛔", targetId);
+    console.log("💢💢💢", `${_id[1]}__${_id[2]}`, obj);
     const updatedChildren = obj.children.map((child) =>
       updateObject(child, targetId, newArray)
     );
@@ -199,11 +186,14 @@ export function updateObject(obj, targetId, newArray) {
   return obj;
 }
 
-export function findChildrenById(obj, targetId) {
+export function findChildrenById(obj, targetId, result) {
   // Check if the current object's id matches the targetId
   console.log("find Item children", obj, targetId);
-
-  if (obj.id === targetId) {
+  const _id = obj.id.split("__");
+  console.log("Split id", _id);
+  console.log("result 🧨🧨🧨", result);
+  if (`${_id[1]}` === targetId) {
+    console.log("♨️♨️♨️♨️🎉🚀", `${_id[1]}__${_id[2]}`, targetId, obj);
     return obj.children; // Return the children array of the matched object
   }
 
@@ -222,4 +212,63 @@ export function findChildrenById(obj, targetId) {
   return null;
 }
 
-//!___________________________________
+export function findChildrenThirdLevel(obj, targetId) {
+  // Check if the current object's id matches the targetId
+  //   console.log("find Item children", obj, targetId);
+  const _id = obj.id.split("__");
+  console.log("Split id", _id);
+  console.log("result 🧨🧨🧨", obj, targetId);
+  if (obj.id === targetId) {
+    console.log("♨️♨️♨️♨️🎉🚀", `${_id[1]}__${_id[2]}`, targetId, obj.children);
+    return obj.children; // Return the children array of the matched object
+  }
+
+  // Check if the current object has a "children" property
+  if (obj.children && Array.isArray(obj.children)) {
+    // If the current object doesn't match the targetId, recursively search in its children
+    for (const child of obj.children) {
+      const result = findChildrenThirdLevel(child, targetId);
+      if (result) {
+        return result; // Return the result if found in children
+      }
+    }
+  }
+
+  // If not found, return null
+  return null;
+}
+
+export function updateObjectThirdChildren(obj, targetId, newArray) {
+  // If the current object's id matches the targetId, return a new object with the updated children array
+  const _id = obj.id.split("__");
+  console.log("✨✨✨✨✨", targetId, "🗾🗾🗾", obj.id);
+  if (obj.id === targetId) {
+    console.log(
+      "Split id update Obj 🤷‍♂️🤷‍♂️🤷‍♂️",
+      obj,
+      newArray,
+      targetId,
+      _id[1],
+      _id[2]
+    );
+    console.log("🪢🪢🪢", targetId, "🎉✨🎉", ` ${_id[1]}__${_id[2]}`);
+    console.log("🚀🚀🚀🚀");
+    console.log("🎯🎯🎯", obj);
+    return { ...obj, children: newArray };
+  }
+
+  // If the current object does not match the targetId, check if it has a "children" property
+  if (obj.children) {
+    // console.log("⛔⛔⛔", targetId, "🚩🚩🚩", obj.id);
+    console.log("💢💢💢", `${_id[1]}__${_id[2]}`, obj);
+    const updatedChildren = obj.children.map((child) =>
+      updateObjectThirdChildren(child, targetId, newArray)
+    );
+
+    // Return a new object with the updated children (if any)
+    return { ...obj, children: updatedChildren };
+  }
+
+  // If the current object does not have a "children" property, return the object as is
+  return obj;
+}

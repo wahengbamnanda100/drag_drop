@@ -31,6 +31,9 @@ function MainLayout() {
         <Button variant="outlined" onClick={() => navigate("/newdragdrop")}>
           New Drag and drop
         </Button>
+        <Button variant="outlined" onClick={() => navigate("/newnewdragdrop")}>
+          New New Drag and drop
+        </Button>
       </Stack>
     </Container>
   );

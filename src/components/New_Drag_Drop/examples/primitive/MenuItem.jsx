@@ -24,9 +24,8 @@ const getBorderColor = (isDragging, authorColors) =>
 const Container = styled.a`
   border-radius: ${borderRadius}px;
   border: 2px solid transparent;
-  border-color: ${(props) => getBorderColor(props.isDragging, props.colors)};
-  background-color: ${(props) =>
-    getBackgroundColor(props.isDragging, props.isGroupedOver, props.colors)};
+  border-color: ${colors.DN600};
+  background-color: white;
   box-shadow: ${({ isDragging }) =>
     isDragging ? `2px 2px 1px ${colors.N70}` : "none"};
   box-sizing: border-box;
@@ -93,7 +92,7 @@ function getStyle(provided, style) {
 const MenuItem = (props) => {
   const { data, isDragging, isGroupedOver, provided, style, isClone, index } =
     props;
-  console.log("MenuITem", data);
+  //   console.log("MenuITem", data);
 
   return (
     <Container
@@ -111,8 +110,28 @@ const MenuItem = (props) => {
       aria-label={`${data.title} data`}
     >
       <Content>
-        <Typography variant="body2">{data.title}</Typography>
-        <Typography variant="subtitle1">{data?.subTitle.$ref}</Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+            width: "100%",
+          }}
+        >
+          {data.title}
+        </Typography>
+        <Typography
+          variant="subtitle2"
+          color={colors.N300}
+          sx={{
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+            width: "100%",
+          }}
+        >
+          {data?.subTitle.$ref}
+        </Typography>
+        <Typography variant="subtitle2">{data.id}</Typography>
         {/* <Footer>
           <Author colors={quote.author.colors}>{quote.author.name}</Author>
           <QuoteId>id:{quote.id}</QuoteId>

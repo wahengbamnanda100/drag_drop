@@ -47,7 +47,7 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
             {...dropProvided.droppableProps}
           >
             <Title>{list.title}</Title>
-            {console.log("isnide quote", list)}
+            {/* {console.log("isnide quote", list)} */}
             {list.children.map((item, index) =>
               !item.children ? (
                 renderQuote(item, index)
