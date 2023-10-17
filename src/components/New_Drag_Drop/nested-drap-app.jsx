@@ -373,8 +373,8 @@ const NestedDragApp = () => {
           <NestedDragList
             key={index}
             list={item}
-            isDrop={index == 0 && true}
-            draggable={index === 1 && true}
+            isDrop={index === 3 && true}
+            draggable={index === 3 && true}
           />
         ))}
       </Root>

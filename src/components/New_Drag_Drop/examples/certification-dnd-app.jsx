@@ -177,7 +177,7 @@ const CertificationDndAPP = () => {
     const sInd = source.droppableId;
     const dInd = destination?.droppableId;
 
-    const dragID = destination.draggableId;
+    // const dragID = destination.draggableId;
     console.log("type __", type, sInd, dInd);
     const dropId = source.index;
 
@@ -324,8 +324,8 @@ const CertificationDndAPP = () => {
           <NestedDragList
             key={index}
             list={item}
-            isDrop={index === 0 && true}
-            draggable={index === 1 && true}
+            isDrop={index === 3 && true}
+            draggable={index === 3 && true}
           />
         ))}
       </Root>
