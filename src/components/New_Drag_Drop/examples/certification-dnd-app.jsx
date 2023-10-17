@@ -324,7 +324,7 @@ const CertificationDndAPP = () => {
           <NestedDragList
             key={index}
             list={item}
-            isDrop={index === 3 && true}
+            isDrop={index === 0 && true}
             draggable={index === 3 && true}
           />
         ))}
