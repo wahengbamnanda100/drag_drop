@@ -12,6 +12,8 @@ import reorder, {
   findChildrenThirdLevel,
   updateObject,
   updateObjectThirdChildren,
+  findIndexInNestedArray,
+  findIndexInNestedArrayPnC,
 } from "../examples/helper/customHelper";
 import jsonData from "../../../utils/treeData.json";
 import newJosnData from "../../../utils/newTreeData.json";
@@ -313,7 +315,120 @@ const CertificationDndAPP = () => {
         setState(LISTL1);
         return;
       }
-      console.log("level - 0");
+    } else {
+      console.log("🚨🚨🚨", "else");
+      if (type === "level-1") {
+        const children = reorder(
+          state[1].children,
+          result.source.index,
+          result.destination.index
+        );
+
+        const list = {
+          ...state[1],
+          children,
+        };
+        console.log("🎁🎁🎁🎁", list);
+        console.log("🎀🎀🎀🎀", _.cloneDeep(state[0]));
+        const LIST = [...state];
+        LIST[0] = _.cloneDeep(state[0]);
+        LIST[1] = list;
+        setState(LIST);
+      } else if (type === "level-2") {
+        const findID = result.destination.droppableId.split("__");
+        const index = state[1].children.findIndex((item) => {
+          if (item.key === findID[0]) {
+            return true;
+          }
+          return false;
+        });
+        console.log("🌍🌍", index, result);
+        const nested = state[1].children.filter((item) =>
+          Object.prototype.hasOwnProperty.call(item, "children")
+        )[index];
+
+        console.log("🎗️🎗️🎗️🎗️", nested);
+
+        const updated = {
+          ...nested,
+          children: reorder(
+            nested.children,
+            result.source.index,
+            // $ExpectError - already checked for null
+            result.destination.index
+          ),
+        };
+
+        const nestedIndex = state[1].children.indexOf(nested);
+        const children = Array.from(state[1].children);
+        children[nestedIndex] = updated;
+
+        console.log("🎏🎏🎏🎏", children);
+
+        const List1 = {
+          ...state[1],
+          children,
+        };
+
+        const LIST1 = [...state];
+        LIST1[0] = _.cloneDeep(state[0]);
+        LIST1[1] = List1;
+        setState(LIST1);
+      } else if (type === "level-3-res" || "level-3-param") {
+        console.log("🎨🎨🎨", result);
+
+        const indx = findIndexInNestedArrayPnC(
+          state[1].children,
+          result.destination.droppableId
+        );
+        console.log("🦺🦺🦺", indx);
+        const nested = state[1].children.filter((item) =>
+          Object.prototype.hasOwnProperty.call(item, "children")
+        )[indx.parentIndex];
+
+        const thirdNested = nested.children.filter((item) =>
+          Object.prototype.hasOwnProperty.call(item, "children")
+        )[indx.childIndex];
+
+        console.log("✨✨✨🚩🌍", nested, thirdNested);
+
+        const updated = {
+          ...thirdNested,
+          children: reorder(
+            thirdNested.children,
+            result.source.index,
+            // $ExpectError - already checked for null
+            result.destination.index
+          ),
+        };
+
+        const thirdNestedIndex = nested.children.indexOf(thirdNested);
+        const nestedIndex = state[1].children.indexOf(nested);
+        const children1 = Array.from(nested.children);
+        children1[thirdNestedIndex] = updated;
+
+        const updated1 = {
+          ...nested,
+          children: children1,
+        };
+
+        const children = Array.from(state[1].children);
+        children[nestedIndex] = updated1;
+
+        const list2 = {
+          ...state[1],
+          children,
+        };
+
+        const LIST2 = [...state];
+        LIST2[0] = _.cloneDeep(state[0]);
+        LIST2[1] = list2;
+        setState(LIST2);
+      }
+
+      // else if (type === "level-3-res") {
+
+      // }
     }
   };
 
@@ -324,7 +439,7 @@ const CertificationDndAPP = () => {
           <NestedDragList
             key={index}
             list={item}
-            isDrop={index === 3 && true}
+            isDrop={index === 0 && true}
             draggable={index === 3 && true}
           />
         ))}

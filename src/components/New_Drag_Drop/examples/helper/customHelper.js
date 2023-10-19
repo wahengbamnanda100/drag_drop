@@ -8,6 +8,7 @@ const reorder = (list, startIndex, endIndex) => {
   const [removed] = result.splice(startIndex, 1);
   result.splice(endIndex, 0, removed);
 
+  console.log("REORDER 🎃🎃🎃", result);
   return result;
 };
 
@@ -140,7 +141,7 @@ export const copy = (
   if (!alreadyExists) {
     const copiedItem = updateIdsRecursively(itemToCopy);
 
-    console.log("copied item 📜📜📜📜📜", copiedItem);
+    // console.log("copied item 📜📜📜📜📜", copiedItem);
     // Insert the copied item into the destination array
     destClone.splice(droppableDestination.index, 0, copiedItem);
 
@@ -148,6 +149,7 @@ export const copy = (
   } else {
     console.log("🌍🌍🌍", itemToCopy);
     // Item already exists in the destination, return the original arrays
+    console.log("🦺🦺🦺🎨🎨🎨", "turn modal on");
     return [sourceClone, destClone, itemToCopy];
   }
 };
@@ -188,12 +190,12 @@ export function updateObject(obj, targetId, newArray, result) {
 
 export function findChildrenById(obj, targetId, result) {
   // Check if the current object's id matches the targetId
-  console.log("find Item children", obj, targetId);
+  // console.log("find Item children", obj, targetId);
   const _id = obj.id.split("__");
-  console.log("Split id", _id);
-  console.log("result 🧨🧨🧨", result);
+  // console.log("Split id", _id);
+  // console.log("result 🧨🧨🧨", result);
   if (`${_id[1]}` === targetId) {
-    console.log("♨️♨️♨️♨️🎉🚀", `${_id[1]}__${_id[2]}`, targetId, obj);
+    // console.log("♨️♨️♨️♨️🎉🚀", `${_id[1]}__${_id[2]}`, targetId, obj);
     return obj.children; // Return the children array of the matched object
   }
 
@@ -216,10 +218,10 @@ export function findChildrenThirdLevel(obj, targetId) {
   // Check if the current object's id matches the targetId
   //   console.log("find Item children", obj, targetId);
   const _id = obj.id.split("__");
-  console.log("Split id", _id);
-  console.log("result 🧨🧨🧨", obj, targetId);
+  // console.log("Split id", _id);
+  // console.log("result 🧨🧨🧨", obj, targetId);
   if (obj.id === targetId) {
-    console.log("♨️♨️♨️♨️🎉🚀", `${_id[1]}__${_id[2]}`, targetId, obj.children);
+    // console.log("♨️♨️♨️♨️🎉🚀", `${_id[1]}__${_id[2]}`, targetId, obj.children);
     return obj.children; // Return the children array of the matched object
   }
 
@@ -241,26 +243,26 @@ export function findChildrenThirdLevel(obj, targetId) {
 export function updateObjectThirdChildren(obj, targetId, newArray) {
   // If the current object's id matches the targetId, return a new object with the updated children array
   const _id = obj.id.split("__");
-  console.log("✨✨✨✨✨", targetId, "🗾🗾🗾", obj.id);
+  // console.log("✨✨✨✨✨", targetId, "🗾🗾🗾", obj.id);
   if (obj.id === targetId) {
-    console.log(
-      "Split id update Obj 🤷‍♂️🤷‍♂️🤷‍♂️",
-      obj,
-      newArray,
-      targetId,
-      _id[1],
-      _id[2]
-    );
-    console.log("🪢🪢🪢", targetId, "🎉✨🎉", ` ${_id[1]}__${_id[2]}`);
-    console.log("🚀🚀🚀🚀");
-    console.log("🎯🎯🎯", obj);
+    // console.log(
+    //   "Split id update Obj 🤷‍♂️🤷‍♂️🤷‍♂️",
+    //   obj,
+    //   newArray,
+    //   targetId,
+    //   _id[1],
+    //   _id[2]
+    // );
+    // console.log("🪢🪢🪢", targetId, "🎉✨🎉", ` ${_id[1]}__${_id[2]}`);
+    // console.log("🚀🚀🚀🚀");
+    // console.log("🎯🎯🎯", obj);
     return { ...obj, children: newArray };
   }
 
   // If the current object does not match the targetId, check if it has a "children" property
   if (obj.children) {
     // console.log("⛔⛔⛔", targetId, "🚩🚩🚩", obj.id);
-    console.log("💢💢💢", `${_id[1]}__${_id[2]}`, obj);
+    // console.log("💢💢💢", `${_id[1]}__${_id[2]}`, obj);
     const updatedChildren = obj.children.map((child) =>
       updateObjectThirdChildren(child, targetId, newArray)
     );
@@ -271,4 +273,41 @@ export function updateObjectThirdChildren(obj, targetId, newArray) {
 
   // If the current object does not have a "children" property, return the object as is
   return obj;
+}
+
+export function findIndexInNestedArray(arr, targetValue) {
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    if (item.id === targetValue) {
+      // console.log("🎠🎠🎠", item.id, targetValue);
+      return i;
+    }
+    if (item.children && Array.isArray(item.children)) {
+      const childResult = findIndexInNestedArray(item.children, targetValue);
+      if (childResult !== -1) {
+        return childResult;
+      }
+    }
+  }
+  return -1; // Return -1 if not found in the current level or its children.
+}
+
+export function findIndexInNestedArrayPnC(arr, targetValue, parentIndex = -1) {
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    if (item.id === targetValue) {
+      return { childIndex: i, parentIndex };
+    }
+    if (item.children && Array.isArray(item.children)) {
+      const childResult = findIndexInNestedArrayPnC(
+        item.children,
+        targetValue,
+        i
+      );
+      if (childResult.childIndex !== -1) {
+        return childResult;
+      }
+    }
+  }
+  return { childIndex: -1, parentIndex }; // Return -1 for childIndex if not found in the current level or its children.
 }

@@ -225,11 +225,15 @@ const NestedDragApp = () => {
 
     const sInd = source.droppableId;
     const dInd = destination.droppableId;
+    console.log("✒️✒️✒️", sInd, dInd);
 
     if (sInd !== dInd) {
       if (type === "level-1") {
         //! 1st level
-        console.log("res", source, destination);
+        console.log("res 🎯🎯🎯🎯", source, destination, result);
+
+        // if()
+
         const list1 = state[0].children;
         const list2 = state[1].children;
         const [sourceclone, destClone, copiedItem] = copy(
@@ -311,6 +315,102 @@ const NestedDragApp = () => {
         setState(LISTL1);
         return;
       }
+    } else {
+      console.log("🎯🎯🎯🌍🌍🌍", result);
+
+      if (type === "level-1") {
+        const children = reorder(
+          state[1].children,
+          result.source.index,
+          result.destination.index
+        );
+
+        const list = {
+          ...state[1],
+          children,
+        };
+        console.log("🚩🚩🚩🚩", list);
+        setState([_.cloneDeep(state[0]), list]);
+      } else if (type === "level-2") {
+        console.log("✨✨✨", result, state[1].children);
+        const nested = state[1].children.filter((item) =>
+          Object.prototype.hasOwnProperty.call(item, "children")
+        )[0];
+
+        const updated = {
+          ...nested,
+          children: reorder(
+            nested.children,
+            result.source.index,
+            // $ExpectError - already checked for null
+            result.destination.index
+          ),
+        };
+
+        console.log("📃📃📃", nested);
+
+        const nestedIndex = state[1].children.indexOf(nested);
+        const children = Array.from(state[1].children);
+        children[nestedIndex] = updated;
+
+        console.log("✨✨🗾🗾🧨🧨", nestedIndex, children);
+
+        const List1 = {
+          ...state[1],
+          children,
+        };
+
+        setState([_.cloneDeep(state[0]), List1]);
+      } else if (type === "level-3") {
+        //!=====================================================
+        console.log("✨✨✨", result, state[1].children);
+
+        const nested = state[1].children.filter((item) =>
+          Object.prototype.hasOwnProperty.call(item, "children")
+        )[0];
+
+        const thirdNested = nested.children.filter((item) =>
+          Object.prototype.hasOwnProperty.call(item, "children")
+        )[0];
+
+        console.log("✨✨✨🚩🌍", nested, thirdNested);
+
+        const updated = {
+          ...thirdNested,
+          children: reorder(
+            thirdNested.children,
+            result.source.index,
+            // $ExpectError - already checked for null
+            result.destination.index
+          ),
+        };
+
+        console.log("🚀🚀🚀🚀🚀🚀♨️", updated);
+
+        const thirdNestedIndex = nested.children.indexOf(thirdNested);
+        const nestedIndex = state[1].children.indexOf(nested);
+        const children1 = Array.from(nested.children);
+        children1[thirdNestedIndex] = updated;
+
+        console.log("🗾🚩✨🧨🗾", children1);
+
+        const updated1 = {
+          ...nested,
+          children: children1,
+        };
+
+        const children = Array.from(state[1].children);
+        children[nestedIndex] = updated1;
+
+        console.log("⛑️⛑️⛑️⛑️", children);
+
+        const List2 = {
+          ...state[1],
+          children,
+        };
+
+        setState([_.cloneDeep(state[0]), List2]);
+      }
     }
 
     // if (result.type === "level-1") {
@@ -373,7 +473,7 @@ const NestedDragApp = () => {
           <NestedDragList
             key={index}
             list={item}
-            isDrop={index === 3 && true}
+            isDrop={index === 0 && true}
             draggable={index === 3 && true}
           />
         ))}
