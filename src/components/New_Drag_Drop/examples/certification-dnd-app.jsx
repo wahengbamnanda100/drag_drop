@@ -14,11 +14,13 @@ import reorder, {
   updateObjectThirdChildren,
   findIndexInNestedArray,
   findIndexInNestedArrayPnC,
+  removeItemWithId,
 } from "../examples/helper/customHelper";
 import jsonData from "../../../utils/treeData.json";
 import newJosnData from "../../../utils/newTreeData.json";
 import _ from "lodash";
 import NestedDragList from "./primitive/certification-dnd-list";
+import CustomModal from "./helper/Modal";
 
 const grid = 8;
 
@@ -168,6 +170,9 @@ const initialList2 = coverttoNestedObject(newJosnData, 2);
 const CertificationDndAPP = () => {
   const [state, setState] = useState([initialList, initialList2]);
 
+  const [open, setOpen] = useState(false);
+  const [overWrite, setOverWrite] = useState(false);
+
   const onDragEnd = (result) => {
     const { source, destination, type } = result;
     // const filteredType = type.split("__");
@@ -193,13 +198,21 @@ const CertificationDndAPP = () => {
         //! 1st level
         console.log("1st level");
         console.log("res", source, destination, type);
+        const sourceIndx = sInd.split("__");
+        const destIndx = dInd.split("__");
+        console.log("⚡", sourceIndx[1], "🔥", destIndx[1]);
+        if (sourceIndx[1] === destIndx[1]) {
+          console.log("🗾🗾🗾🗾");
+          return;
+        }
         const list1 = state[0].children;
         const list2 = state[1].children;
         const [sourceclone, destClone, copiedItem] = copy(
           list1,
           list2,
           source,
-          destination
+          destination,
+          setOpen
         );
         const newList0 = {
           ...state[0],
@@ -219,6 +232,13 @@ const CertificationDndAPP = () => {
 
       if (type === "level-2") {
         console.log("🚀👌 level - 2 ");
+        const sourceIndx = sInd.split("__");
+        const destIndx = dInd.split("__");
+        console.log("⚡", sourceIndx[1], "🔥", destIndx[1]);
+        if (sourceIndx[1] === destIndx[1]) {
+          console.log("🗾🗾🗾🗾");
+          return;
+        }
         const childrenList1 = findChildrenById(state[0], `1-level1`, result);
         const childrenList2 = findChildrenById(state[1], `2-level1`, result);
 
@@ -228,7 +248,8 @@ const CertificationDndAPP = () => {
           childrenList1,
           childrenList2,
           source,
-          destination
+          destination,
+          setOpen
         );
 
         console.log("⌛⌛⌛", sourcecloneChildren, destCloneChildren, result);
@@ -260,6 +281,13 @@ const CertificationDndAPP = () => {
       if (type === "level-3-res") {
         console.log("type level 3", type);
         console.log("🎉📜📃", sInd, dInd);
+        const sourceIndx = sInd.split("__");
+        const destIndx = dInd.split("__");
+        console.log("⚡", sourceIndx[1], "🔥", destIndx[1]);
+        if (sourceIndx[1] === destIndx[1]) {
+          console.log("🗾🗾🗾🗾");
+          return;
+        }
         const nestedChildrenList1 = findChildrenThirdLevel(state[0], sInd);
         const nestedChildrenList2 = findChildrenThirdLevel(state[1], dInd);
 
@@ -267,7 +295,13 @@ const CertificationDndAPP = () => {
         console.log("📜❓❓❓", nestedChildrenList2);
 
         const [sourcecloneNestedChildren, destCloneNestedChildren, copiedItem] =
-          copy(nestedChildrenList1, nestedChildrenList2, source, destination);
+          copy(
+            nestedChildrenList1,
+            nestedChildrenList2,
+            source,
+            destination,
+            setOpen
+          );
 
         const newNestedList1 = updateObjectThirdChildren(
           state[0],
@@ -289,14 +323,27 @@ const CertificationDndAPP = () => {
       if (type === "level-3-param") {
         console.log("type level 3", type);
         console.log("🎉📜📃", sInd, dInd);
+        const sourceIndx = sInd.split("__");
+        const destIndx = dInd.split("__");
+        console.log("⚡", sourceIndx[1], "🔥", destIndx[1]);
+        if (sourceIndx[1] === destIndx[1]) {
+          console.log("🗾🗾🗾🗾");
+          return;
+        }
         const nestedChildrenList1 = findChildrenThirdLevel(state[0], sInd);
         const nestedChildrenList2 = findChildrenThirdLevel(state[1], dInd);
 
-        console.log("📃‼️‼️❓⁉️❓", nestedChildrenList1);
+        console.log("", nestedChildrenList1);
         console.log("📜❓❓❓", nestedChildrenList2);
 
         const [sourcecloneNestedChildren, destCloneNestedChildren, copiedItem] =
-          copy(nestedChildrenList1, nestedChildrenList2, source, destination);
+          copy(
+            nestedChildrenList1,
+            nestedChildrenList2,
+            source,
+            destination,
+            setOpen
+          );
 
         const newNestedList1 = updateObjectThirdChildren(
           state[0],
@@ -432,6 +479,20 @@ const CertificationDndAPP = () => {
     }
   };
 
+  const handleUndo = (list) => {
+    console.log("parent ⚡⚡⚡", list);
+    const updatedObj = removeItemWithId(state[1], list.id);
+    console.log("updated 🚨🚨🚨", updatedObj);
+    const LIST = [...state];
+    LIST[0] = _.cloneDeep(state[0]);
+    LIST[1] = updatedObj;
+    setState(LIST);
+  };
+
+  // const handleOverWrite = () => {
+  //   setOverWrite(true);
+  // };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Root>
@@ -441,9 +502,15 @@ const CertificationDndAPP = () => {
             list={item}
             isDrop={index === 0 && true}
             draggable={index === 3 && true}
+            onClickUndo={handleUndo}
           />
         ))}
       </Root>
+      <CustomModal
+        open={open}
+        handleClose={() => setOpen(false)}
+        handleOverWrite={() => setOpen(false)}
+      />
     </DragDropContext>
   );
 };

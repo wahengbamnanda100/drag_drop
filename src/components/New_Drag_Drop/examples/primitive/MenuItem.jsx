@@ -1,7 +1,9 @@
 import React from "react";
 import styled from "@emotion/styled";
 import { colors } from "@atlaskit/theme";
-import { Typography } from "@mui/material";
+import { IconButton, Tooltip, Typography } from "@mui/material";
+import UndoIcon from "@mui/icons-material/Undo";
+
 export const grid = 8;
 export const borderRadius = 2;
 const imageSize = 40;
@@ -33,6 +35,7 @@ const Container = styled.a`
   min-height: ${imageSize}px;
   margin-bottom: ${grid}px;
   user-select: none;
+  postion: relative;
 
   /* anchor overrides */
   color: ${colors.N900};
@@ -56,6 +59,7 @@ const Container = styled.a`
 const Content = styled.div`
   /* flex child */
   flex-grow: 1;
+  position: relative;
 
   /*
     Needed to wrap text in ie11
@@ -90,8 +94,16 @@ function getStyle(provided, style) {
 }
 
 const MenuItem = (props) => {
-  const { data, isDragging, isGroupedOver, provided, style, isClone, index } =
-    props;
+  const {
+    data,
+    isDragging,
+    isGroupedOver,
+    provided,
+    style,
+    isClone,
+    index,
+    onClickUndo,
+  } = props;
   //   console.log("MenuITem", data);
 
   return (
@@ -110,6 +122,20 @@ const MenuItem = (props) => {
       aria-label={`${data.title} data`}
     >
       <Content>
+        {data?.undo && (
+          <Tooltip arrow title="Undo">
+            <IconButton
+              onClick={() => {
+                console.log("UNDO menu 🛩️🛩️🛩️", data);
+                onClickUndo(data);
+              }}
+              size="small"
+              sx={{ position: "absolute", right: 1, top: 0 }}
+            >
+              <UndoIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
         <Typography
           variant="body2"
           sx={{

@@ -98,25 +98,56 @@ export function moveBetween({ list1, list2, source, destination }) {
   };
 }
 
-function generateUniqueId() {
-  return `${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+function generateUniqueId(obj, arr, len) {
+  console.log("🔥🔥🔥", obj, arr, len);
+  const _id = obj.id.split("__");
+  return `${_id[0]}__${arr[1]}__${len}__${Date.now()}-${Math.floor(
+    Math.random() * 100000
+  )}`;
 }
 
-function updateIdsRecursively(obj) {
-  const newObj = { ...obj, id: generateUniqueId() };
+function updateIdsRecursively(obj, arr, len) {
+  const newObj = { ...obj, id: generateUniqueId(obj, arr, len) };
   if (newObj.children && newObj.children.length > 0) {
     newObj.children = newObj.children.map((child) =>
-      updateIdsRecursively(child)
+      updateIdsRecursively(child, arr, len)
     );
   }
+  console.log("UNDO 🪂🪂", newObj);
   return newObj;
+}
+
+export function removeItemWithId(data, targetId) {
+  // Recursively search and remove the item with the targetId
+  function removeItem(arr) {
+    return arr.filter((item) => {
+      if (item.id === targetId) {
+        return false; // Remove the item with the targetId
+      }
+      if (item.children) {
+        item.children = removeItem(item.children); // Recursively check children
+      }
+      return true;
+    });
+  }
+  console.log("data 🌍🌍", data, targetId);
+
+  // return data.map((item) => {
+  //   if (data.children) {
+  //   data = removeItem(item);
+  //   }
+  //   return item;
+  // });
+  const children = removeItem(data.children);
+  return { ...data, children };
 }
 
 export const copy = (
   source,
   destination,
   droppableSource,
-  droppableDestination
+  droppableDestination,
+  setOpen
 ) => {
   const sourceClone = Array.from(source);
   const destClone = Array.from(destination);
@@ -127,6 +158,8 @@ export const copy = (
   // const alreadyExists = destClone.some(
   //   (item) => item.content === itemToCopy.content
   // ); //? change is later
+  const destIndx = destination[0].id.split("__");
+  console.log("⚡⚡⚡🌍", destIndx[1], destination.length);
 
   const alreadyExists = destClone.some((item) => {
     if (itemToCopy.children) {
@@ -139,9 +172,15 @@ export const copy = (
   });
 
   if (!alreadyExists) {
-    const copiedItem = updateIdsRecursively(itemToCopy);
+    const copiedItem = updateIdsRecursively(
+      itemToCopy,
+      destIndx,
+      destination.length
+    );
 
-    // console.log("copied item 📜📜📜📜📜", copiedItem);
+    copiedItem["undo"] = true;
+
+    console.log("copied item 📜📜📜📜📜", copiedItem);
     // Insert the copied item into the destination array
     destClone.splice(droppableDestination.index, 0, copiedItem);
 
@@ -150,6 +189,17 @@ export const copy = (
     console.log("🌍🌍🌍", itemToCopy);
     // Item already exists in the destination, return the original arrays
     console.log("🦺🦺🦺🎨🎨🎨", "turn modal on");
+    setOpen(true);
+    console.log(
+      "🛩️",
+      source,
+      "🪂",
+      destination,
+      "⛵",
+      droppableSource,
+      "🚨",
+      droppableDestination
+    );
     return [sourceClone, destClone, itemToCopy];
   }
 };
@@ -158,24 +208,24 @@ export function updateObject(obj, targetId, newArray, result) {
   // If the current object's id matches the targetId, return a new object with the updated children array
   const _id = obj.id.split("__");
   if (`${_id[1]}__${_id[2]}` === targetId) {
-    console.log(
-      "Split id update Obj 🤷‍♂️🤷‍♂️🤷‍♂️",
-      obj,
-      newArray,
-      targetId,
-      _id[1],
-      _id[2]
-    );
-    console.log("🪢🪢🪢", targetId, "🎉✨🎉", ` ${_id[1]}__${_id[2]}`);
-    console.log("🚀🚀🚀🚀", result);
-    console.log("🎯🎯🎯", obj);
+    // console.log(
+    //   "Split id update Obj 🤷‍♂️🤷‍♂️🤷‍♂️",
+    //   obj,
+    //   newArray,
+    //   targetId,
+    //   _id[1],
+    //   _id[2]
+    // );
+    // console.log("🪢🪢🪢", targetId, "🎉✨🎉", ` ${_id[1]}__${_id[2]}`);
+    // console.log("🚀🚀🚀🚀", result);
+    // console.log("🎯🎯🎯", obj);
     return { ...obj, children: newArray };
   }
 
   // If the current object does not match the targetId, check if it has a "children" property
   if (obj.children) {
-    console.log("🚩🚩🚩 ⛔⛔⛔", targetId);
-    console.log("💢💢💢", `${_id[1]}__${_id[2]}`, obj);
+    // console.log("🚩🚩🚩 ⛔⛔⛔", targetId);
+    // console.log("💢💢💢", `${_id[1]}__${_id[2]}`, obj);
     const updatedChildren = obj.children.map((child) =>
       updateObject(child, targetId, newArray)
     );

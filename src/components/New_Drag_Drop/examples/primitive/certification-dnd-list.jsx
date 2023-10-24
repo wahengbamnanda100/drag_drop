@@ -6,10 +6,17 @@ import styled from "@emotion/styled";
 import { colors } from "@atlaskit/theme";
 // import CLoneQuoteItem from "./premitive/clone-quote-item";
 import MenuItem from "./MenuItem";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, IconButton, Tooltip } from "@mui/material";
+import UndoIcon from "@mui/icons-material/Undo";
 
-const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
-  const renderQuote = (data, index) => (
+const NestedDragList = ({
+  list,
+  order,
+  isDrop = false,
+  draggable = false,
+  onClickUndo,
+}) => {
+  const renderQuote = (data, index, onClickUndo) => (
     <Draggable
       isDragDisabled={draggable}
       key={data.id}
@@ -22,6 +29,7 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
             data={data}
             isDragging={snapshot.isDragging}
             provided={provided}
+            onClickUndo={onClickUndo}
           />
           {/* {snapshot.isDragging && <CLoneQuoteItem quote={quote} />} */}
         </>
@@ -33,7 +41,7 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
     return <h5>{list.title}</h5>;
   };
 
-  const renderList = (list, level, isDrop, draggable) => {
+  const renderList = (list, level, isDrop, draggable, onClickUndo) => {
     // console.log("List data", list);
     return (
       <Droppable
@@ -48,6 +56,25 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
             isDraggingOver={dropSnapshot.isDraggingOver}
             {...dropProvided.droppableProps}
           >
+            {list?.undo && (
+              <Tooltip arroe title="Undo">
+                <IconButton
+                  onClick={() => {
+                    console.log("Undo 🔥🔥🔥", list);
+                    onClickUndo(list);
+                  }}
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    right: 1,
+                    top: 0,
+                    bgcolor: "white",
+                  }}
+                >
+                  <UndoIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
             <Box sx={{ width: "100%" }}>
               <Typography
                 variant="body1"
@@ -64,7 +91,7 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
             </Box>
             {list.children.map((item, index) =>
               !item.children ? (
-                renderQuote(item, index)
+                renderQuote(item, index, onClickUndo)
               ) : (
                 <Draggable
                   isDragDisabled={draggable}
@@ -80,7 +107,13 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
                         {...dragProvided.draggableProps}
                         {...dragProvided.dragHandleProps}
                       >
-                        {renderList(item, level + 1, isDrop, draggable)}
+                        {renderList(
+                          item,
+                          level + 1,
+                          isDrop,
+                          draggable,
+                          onClickUndo
+                        )}
                       </NestedContainer>
                       {dragSnapshot.isDragging && <div>Hello LIST</div>}
                     </>
@@ -94,7 +127,7 @@ const NestedDragList = ({ list, order, isDrop = false, draggable = false }) => {
       </Droppable>
     );
   };
-  return <Root>{renderList(list, 1, isDrop, draggable)}</Root>;
+  return <Root>{renderList(list, 1, isDrop, draggable, onClickUndo)}</Root>;
 };
 
 export default NestedDragList;
@@ -113,6 +146,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: ${grid}px;
+  position: relative;
   padding-bottom: 0;
   user-select: none;
   overflow-x: hidden;
