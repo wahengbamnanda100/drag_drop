@@ -6,8 +6,9 @@ import styled from "@emotion/styled";
 import { colors } from "@atlaskit/theme";
 // import CLoneQuoteItem from "./premitive/clone-quote-item";
 import MenuItem from "./MenuItem";
-import { Box, Typography, IconButton, Tooltip } from "@mui/material";
+import { Box, Typography, IconButton, Tooltip, Stack } from "@mui/material";
 import UndoIcon from "@mui/icons-material/Undo";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 const NestedDragList = ({
   list,
@@ -15,8 +16,9 @@ const NestedDragList = ({
   isDrop = false,
   draggable = false,
   onClickUndo,
+  onClickSwap,
 }) => {
-  const renderQuote = (data, index, onClickUndo) => (
+  const renderQuote = (data, index, onClickUndo, onClickSwap) => (
     <Draggable
       isDragDisabled={draggable}
       key={data.id}
@@ -30,6 +32,7 @@ const NestedDragList = ({
             isDragging={snapshot.isDragging}
             provided={provided}
             onClickUndo={onClickUndo}
+            onClickSwap={onClickSwap}
           />
           {/* {snapshot.isDragging && <CLoneQuoteItem quote={quote} />} */}
         </>
@@ -41,7 +44,14 @@ const NestedDragList = ({
     return <h5>{list.title}</h5>;
   };
 
-  const renderList = (list, level, isDrop, draggable, onClickUndo) => {
+  const renderList = (
+    list,
+    level,
+    isDrop,
+    draggable,
+    onClickUndo,
+    onClickSwap
+  ) => {
     // console.log("List data", list);
     return (
       <Droppable
@@ -61,7 +71,7 @@ const NestedDragList = ({
                 <IconButton
                   onClick={() => {
                     console.log("Undo 🔥🔥🔥", list);
-                    onClickUndo(list);
+                    list?.undo && onClickUndo(list);
                   }}
                   size="small"
                   sx={{
@@ -75,23 +85,70 @@ const NestedDragList = ({
                 </IconButton>
               </Tooltip>
             )}
-            <Box sx={{ width: "100%" }}>
-              <Typography
-                variant="body1"
-                fontWeight={"medium"}
-                sx={{
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                  width: "100%",
-                  pb: "10px",
-                }}
-              >
-                {list.title}
-              </Typography>
-            </Box>
+            {list?.swap && (
+              <Tooltip arroe title="Swap Back">
+                <IconButton
+                  onClick={() => {
+                    console.log("Undo 🔥🔥🔥", list);
+                    list?.swap && onClickSwap(list);
+                  }}
+                  size="small"
+                  sx={{
+                    position: "absolute",
+                    right: 1,
+                    top: 0,
+                    bgcolor: "white",
+                  }}
+                >
+                  <UndoIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Stack
+              direction={"row"}
+              alignItems={"center"}
+              justifyContent={"start"}
+              spacing={1}
+            >
+              {/* <Tooltip arroe title="collapse">
+                <IconButton
+                  onClick={() => {
+                    console.log("Undo 🔥🔥🔥", list);
+                    // setToggle(!toggle)
+                    // list?.undo && onClickUndo(list);
+                  }}
+                  size="small"
+                  sx={
+                    {
+                      // position: "absolute",
+                      // left: 1,
+                      // top: 0,
+                      // bgcolor: "white",
+                    }
+                  }
+                >
+                  <KeyboardArrowDownIcon fontSize="small" />
+                </IconButton>
+              </Tooltip> */}
+              <Box sx={{ width: "100%" }}>
+                <Typography
+                  variant="body1"
+                  fontWeight={"medium"}
+                  sx={{
+                    whiteSpace: "pre-wrap",
+                    wordBreak: "break-word",
+                    width: "100%",
+                    pb: "10px",
+                  }}
+                >
+                  {list.title}
+                </Typography>
+              </Box>
+            </Stack>
+
             {list.children.map((item, index) =>
               !item.children ? (
-                renderQuote(item, index, onClickUndo)
+                renderQuote(item, index, onClickUndo, onClickSwap)
               ) : (
                 <Draggable
                   isDragDisabled={draggable}
@@ -112,7 +169,8 @@ const NestedDragList = ({
                           level + 1,
                           isDrop,
                           draggable,
-                          onClickUndo
+                          onClickUndo,
+                          onClickSwap
                         )}
                       </NestedContainer>
                       {dragSnapshot.isDragging && <div>Hello LIST</div>}
@@ -127,7 +185,11 @@ const NestedDragList = ({
       </Droppable>
     );
   };
-  return <Root>{renderList(list, 1, isDrop, draggable, onClickUndo)}</Root>;
+  return (
+    <Root>
+      {renderList(list, 1, isDrop, draggable, onClickUndo, onClickSwap)}
+    </Root>
+  );
 };
 
 export default NestedDragList;

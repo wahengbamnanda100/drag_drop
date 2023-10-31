@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import React from "react";
 
-const CustomModal = ({ open, handleClose, handleOverWrite }) => {
+const CustomModal = ({ open, handleClose, handleMerge, handleOverWrite }) => {
   return (
     <Dialog
       open={open}
@@ -25,7 +25,7 @@ const CustomModal = ({ open, handleClose, handleOverWrite }) => {
           <Button variant="text" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="outlined" onClick={handleClose}>
+          <Button variant="outlined" onClick={handleMerge}>
             Merge
           </Button>
           <Button variant="contained" onClick={handleOverWrite} autoFocus>

@@ -190,19 +190,36 @@ export const copy = (
     // Item already exists in the destination, return the original arrays
     console.log("🦺🦺🦺🎨🎨🎨", "turn modal on");
     setOpen(true);
-    console.log(
-      "🛩️",
-      source,
-      "🪂",
-      destination,
-      "⛵",
-      droppableSource,
-      "🚨",
-      droppableDestination
-    );
+    // const Result = await openModalAndWait();
+
+    // console.log("Waited mOdal Action 🚨", Result);
     return [sourceClone, destClone, itemToCopy];
   }
 };
+
+export function replaceElementByKeyAndTitle(arr, replacementElement, setdata) {
+  const indexToReplace = arr.findIndex(
+    (element) =>
+      element.key === replacementElement.key &&
+      element.title === replacementElement.title
+  );
+
+  if (indexToReplace !== -1) {
+    const replacedElement = arr[indexToReplace];
+
+    // Update the id of the replacement element and its children recursively
+    const updatedElement = updateIdsRecursively(
+      replacementElement,
+      replacedElement.id.split("__"),
+      arr.length
+    );
+    setdata((prev) => [...prev, replacedElement]);
+    // updatedElement["swap"] = true;
+    arr[indexToReplace] = updatedElement;
+  }
+
+  return arr;
+}
 
 export function updateObject(obj, targetId, newArray, result) {
   // If the current object's id matches the targetId, return a new object with the updated children array
@@ -360,4 +377,51 @@ export function findIndexInNestedArrayPnC(arr, targetValue, parentIndex = -1) {
     }
   }
   return { childIndex: -1, parentIndex }; // Return -1 for childIndex if not found in the current level or its children.
+}
+
+export function replaceItemById(root, targetId, newItem) {
+  console.log("🌍 Reapalce", root, targetId, newItem);
+  const parent = findChildrenById(root, targetId);
+
+  if (parent && parent.children) {
+    // Find the index of the item to replace within the parent's children array
+    const index = parent.children.findIndex((child) => {
+      const _id = child.id.split("__");
+      return `${_id[1]}` === targetId;
+    });
+
+    if (index !== -1) {
+      // Replace the item at the found index with the new item
+      parent.children[index] = newItem;
+    }
+  }
+}
+
+export function swapItemsByValue(array, obj) {
+  const array2 = [obj];
+
+  const rest = array.map((item, index) => {
+    if (item.id.split("__")[0] === obj.id.split("__")[0] && obj.swap === true) {
+      return item;
+    }
+  });
+
+  console.log("rest Swap 🪂🪂", rest);
+
+  // Create a map of items from array2 using their `id.split("__")[0]` value as the key
+  // const array2Map = new Map(
+  //   array2.map((item) => [item.id.split("__")[0], item])
+  // );
+
+  // // Iterate through array1 and replace items if a matching item exists in array2
+  // const resultArray = array.map((item) => {
+  //   const key = item.id.split("__")[0];
+  //   if (array2Map.has(key)) {
+  //     return array2Map.get(key);
+  //   } else {
+  //     return item;
+  //   }
+  // });
+
+  return rest;
 }

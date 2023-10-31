@@ -103,6 +103,7 @@ const MenuItem = (props) => {
     isClone,
     index,
     onClickUndo,
+    onClickSwap,
   } = props;
   //   console.log("MenuITem", data);
 
@@ -128,6 +129,20 @@ const MenuItem = (props) => {
               onClick={() => {
                 console.log("UNDO menu 🛩️🛩️🛩️", data);
                 onClickUndo(data);
+              }}
+              size="small"
+              sx={{ position: "absolute", right: 1, top: 0 }}
+            >
+              <UndoIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+        {data?.swap && (
+          <Tooltip arrow title="Swap Back">
+            <IconButton
+              onClick={() => {
+                console.log("SWAP menu 🛩️🛩️🛩️", data);
+                onClickSwap(data);
               }}
               size="small"
               sx={{ position: "absolute", right: 1, top: 0 }}

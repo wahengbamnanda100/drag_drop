@@ -15,6 +15,9 @@ import reorder, {
   findIndexInNestedArray,
   findIndexInNestedArrayPnC,
   removeItemWithId,
+  replaceItemById,
+  replaceElementByKeyAndTitle,
+  swapItemsByValue,
 } from "../examples/helper/customHelper";
 import jsonData from "../../../utils/treeData.json";
 import newJosnData from "../../../utils/newTreeData.json";
@@ -171,7 +174,14 @@ const CertificationDndAPP = () => {
   const [state, setState] = useState([initialList, initialList2]);
 
   const [open, setOpen] = useState(false);
-  const [overWrite, setOverWrite] = useState(false);
+
+  const [copiedItems, setCopiedItems] = useState({
+    destination: null,
+    item: null,
+    level: "",
+  });
+
+  const [overWriteData, setOverWriteData] = useState([]);
 
   const onDragEnd = (result) => {
     const { source, destination, type } = result;
@@ -222,6 +232,11 @@ const CertificationDndAPP = () => {
           ...state[1],
           children: destClone,
         };
+        setCopiedItems({
+          destination: destClone,
+          item: copiedItem,
+          level: "level-1",
+        });
         console.log("result array", sourceclone, destClone, copiedItem);
         const LIST = [...state];
         LIST[0] = newList0;
@@ -251,7 +266,11 @@ const CertificationDndAPP = () => {
           destination,
           setOpen
         );
-
+        setCopiedItems({
+          destination: destCloneChildren,
+          item: copiedItem,
+          level: "level-2",
+        });
         console.log("⌛⌛⌛", sourcecloneChildren, destCloneChildren, result);
 
         const newChildrenList1 = updateObject(
@@ -302,7 +321,11 @@ const CertificationDndAPP = () => {
             destination,
             setOpen
           );
-
+        setCopiedItems({
+          destination: destCloneNestedChildren,
+          item: copiedItem,
+          level: "level-3-res",
+        });
         const newNestedList1 = updateObjectThirdChildren(
           state[0],
           sInd,
@@ -344,7 +367,11 @@ const CertificationDndAPP = () => {
             destination,
             setOpen
           );
-
+        setCopiedItems({
+          destination: destCloneNestedChildren,
+          item: copiedItem,
+          level: "level-3-param",
+        });
         const newNestedList1 = updateObjectThirdChildren(
           state[0],
           sInd,
@@ -489,9 +516,54 @@ const CertificationDndAPP = () => {
     setState(LIST);
   };
 
-  // const handleOverWrite = () => {
-  //   setOverWrite(true);
-  // };
+  const handleOverWrite = () => {
+    console.log("Over write item 🪁", copiedItems);
+    const parentList = state[1];
+    if (copiedItems.level === "level-3-res") {
+      const updatedArr = replaceElementByKeyAndTitle(
+        copiedItems.destination,
+        copiedItems.item,
+        setOverWriteData
+      );
+      setOpen(false);
+      console.log("previous data 🎗️", copiedItems.destination);
+      console.log("OverWrite item in level-3-res 🔥", updatedArr);
+    } else if (copiedItems.level === "level-3-param") {
+      const updatedArr = replaceElementByKeyAndTitle(
+        copiedItems.destination,
+        copiedItems.item,
+        setOverWriteData
+      );
+      setOpen(false);
+      console.log("previous data Param🎗️", copiedItems.destination);
+      console.log("OverWrite item in level-3-res Param 🔥", updatedArr);
+    } else {
+      const updatedArr = replaceElementByKeyAndTitle(
+        copiedItems.destination,
+        copiedItems.item,
+        setOverWriteData
+      );
+      setOpen(false);
+    }
+  };
+
+  const handleMerge = () => {
+    console.log("merge item 🪁", copiedItems);
+  };
+
+  const handleSwap = (list) => {
+    console.log("SWAP DATA 🪁", copiedItems);
+    const parentList = state[1];
+    console.log("Swap data 🔥", list, overWriteData);
+    const tobeSwap = swapItemsByValue(overWriteData, list);
+    const swapItem = replaceItemById(
+      state[1],
+      list.id.split("__")[0],
+      tobeSwap[0]
+    );
+
+    console.log("swap !🖍️🖍️", swapItem, tobeSwap[0]);
+  };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -503,13 +575,15 @@ const CertificationDndAPP = () => {
             isDrop={index === 0 && true}
             draggable={index === 3 && true}
             onClickUndo={handleUndo}
+            onClickSwap={handleSwap}
           />
         ))}
       </Root>
       <CustomModal
         open={open}
         handleClose={() => setOpen(false)}
-        handleOverWrite={() => setOpen(false)}
+        handleMerge={handleMerge}
+        handleOverWrite={handleOverWrite}
       />
     </DragDropContext>
   );
