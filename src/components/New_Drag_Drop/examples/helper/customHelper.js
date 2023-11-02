@@ -159,9 +159,10 @@ export const copy = (
   //   (item) => item.content === itemToCopy.content
   // ); //? change is later
   const destIndx = destination[0].id.split("__");
-  console.log("⚡⚡⚡🌍", destIndx[1], destination.length);
+  console.log("⚡⚡⚡🌍", destIndx[1], destination.length, source);
 
   const alreadyExists = destClone.some((item) => {
+    console.log("Item in cehcking 🛸", item, itemToCopy);
     if (itemToCopy.children) {
       // If itemToCopy has children property, compare it with item.title
       return item.title === itemToCopy.title;
@@ -255,14 +256,14 @@ export function updateObject(obj, targetId, newArray, result) {
   return obj;
 }
 
-export function findChildrenById(obj, targetId, result) {
+export function findChildrenById(obj, targetId) {
   // Check if the current object's id matches the targetId
   // console.log("find Item children", obj, targetId);
   const _id = obj.id.split("__");
-  // console.log("Split id", _id);
+  console.log("Split id ⚽", _id[0], "🚀", targetId);
   // console.log("result 🧨🧨🧨", result);
-  if (`${_id[1]}` === targetId) {
-    // console.log("♨️♨️♨️♨️🎉🚀", `${_id[1]}__${_id[2]}`, targetId, obj);
+  if (_id[0] === targetId) {
+    console.log("♨️♨️♨️♨️🎉🚀", `${_id[1]}__${_id[2]}`, targetId, obj);
     return obj.children; // Return the children array of the matched object
   }
 

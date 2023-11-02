@@ -246,16 +246,17 @@ const CertificationDndAPP = () => {
       }
 
       if (type === "level-2") {
-        console.log("🚀👌 level - 2 ");
+        console.log("🚀👌 level - 2 ", result);
         const sourceIndx = sInd.split("__");
         const destIndx = dInd.split("__");
-        console.log("⚡", sourceIndx[1], "🔥", destIndx[1]);
+        console.log("⚡", sourceIndx[0], "🔥", destIndx[0]);
         if (sourceIndx[1] === destIndx[1]) {
           console.log("🗾🗾🗾🗾");
           return;
         }
-        const childrenList1 = findChildrenById(state[0], `1-level1`, result);
-        const childrenList2 = findChildrenById(state[1], `2-level1`, result);
+
+        const childrenList1 = findChildrenById(state[0], sourceIndx[0]);
+        const childrenList2 = findChildrenById(state[1], destIndx[0]);
 
         console.log("leve - 2 data 🖍️🖍️🖍️", childrenList1, childrenList2);
 

@@ -110,26 +110,6 @@ const NestedDragList = ({
               justifyContent={"start"}
               spacing={1}
             >
-              {/* <Tooltip arroe title="collapse">
-                <IconButton
-                  onClick={() => {
-                    console.log("Undo 🔥🔥🔥", list);
-                    // setToggle(!toggle)
-                    // list?.undo && onClickUndo(list);
-                  }}
-                  size="small"
-                  sx={
-                    {
-                      // position: "absolute",
-                      // left: 1,
-                      // top: 0,
-                      // bgcolor: "white",
-                    }
-                  }
-                >
-                  <KeyboardArrowDownIcon fontSize="small" />
-                </IconButton>
-              </Tooltip> */}
               <Box sx={{ width: "100%" }}>
                 <Typography
                   variant="body1"
