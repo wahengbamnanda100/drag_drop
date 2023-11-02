@@ -7,6 +7,7 @@ import DragAndDrop from "./components/Drag_and_drop";
 import DataMapping from "./components/Data_Mapping";
 import NestedDragApp from "./components/New_Drag_Drop/nested-drap-app";
 import CertificationDndAPP from "./components/New_Drag_Drop/examples/certification-dnd-app";
+import MuiTreeDndApp from "./components/New_Drag_Drop/muiTree/mui-tree-app";
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
           <Route path="/datamapping" element={<DataMapping />} />
           <Route path="/newdragdrop" element={<NestedDragApp />} />
           <Route path="/newnewdragdrop" element={<CertificationDndAPP />} />
+          <Route path="/muidragdrop" element={<MuiTreeDndApp />} />
+          <Route path="/atlasdragdrop" element={<MuiTreeDndApp />} />
           <Route path="*" element={<NotFound />} />
           <Route />
         </Routes>

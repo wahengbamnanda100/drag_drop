@@ -1,8 +1,26 @@
 import React, { useState } from "react";
 import _ from "lodash";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { Box, Paper } from "@mui/material";
+import styled from "@emotion/react";
 
 import jsonData from "../../../utils/treeData.json";
 import newJosnData from "../../../utils/newTreeData.json";
+import MuiTreeGragList from "./components/mui-tree-list";
+import reorder, {
+  convertToDndObject,
+  copy,
+  findChildrenById,
+  findChildrenThirdLevel,
+  updateObject,
+  updateObjectThirdChildren,
+  findIndexInNestedArray,
+  findIndexInNestedArrayPnC,
+  removeItemWithId,
+  replaceItemById,
+  replaceElementByKeyAndTitle,
+  swapItemsByValue,
+} from "../examples/helper/customHelper";
 
 function coverttoNestedObject(inputObject, type) {
   let resChildren = [];
@@ -143,5 +161,376 @@ const MuiTreeDndApp = () => {
   });
   const [overWriteData, setOverWriteData] = useState([]);
 
-  return <div>testing</div>;
+  console.log("Data🌍", state);
+
+  const onDragEnd = (result) => {
+    const { source, destination, type } = result;
+    // const filteredType = type.split("__");
+    console.log("sate", state, result);
+    // console.log("result", source, destination, type, filteredType);
+    console.log("result", type);
+    // dropped outside the list
+    // debugger;
+    const sInd = source.droppableId;
+    const dInd = destination?.droppableId;
+
+    // const dragID = destination.draggableId;
+    console.log("type __", type, sInd, dInd);
+    const dropId = source.index;
+
+    if (!result.destination) {
+      console.log("there is no destination");
+      return;
+    }
+
+    if (sInd !== dInd) {
+      if (type === "level-1") {
+        //! 1st level
+        console.log("1st level");
+        console.log("res", source, destination, type);
+        const sourceIndx = sInd.split("__");
+        const destIndx = dInd.split("__");
+        console.log("⚡", sourceIndx[1], "🔥", destIndx[1]);
+        if (sourceIndx[1] === destIndx[1]) {
+          console.log("🗾🗾🗾🗾");
+          return;
+        }
+        const list1 = state[0].children;
+        const list2 = state[1].children;
+        const [sourceclone, destClone, copiedItem] = copy(
+          list1,
+          list2,
+          source,
+          destination,
+          setOpen
+        );
+        const newList0 = {
+          ...state[0],
+          children: sourceclone,
+        };
+        const newList1 = {
+          ...state[1],
+          children: destClone,
+        };
+        setCopiedItems({
+          destination: destClone,
+          item: copiedItem,
+          level: "level-1",
+        });
+        console.log("result array", sourceclone, destClone, copiedItem);
+        const LIST = [...state];
+        LIST[0] = newList0;
+        LIST[1] = newList1;
+        setState(LIST);
+        return;
+      }
+
+      if (type === "level-2") {
+        console.log("🚀👌 level - 2 ", result);
+        const sourceIndx = sInd.split("__");
+        const destIndx = dInd.split("__");
+        console.log("⚡", sourceIndx[0], "🔥", destIndx[0]);
+        if (sourceIndx[1] === destIndx[1]) {
+          console.log("🗾🗾🗾🗾");
+          return;
+        }
+
+        const childrenList1 = findChildrenById(state[0], sourceIndx[0]);
+        const childrenList2 = findChildrenById(state[1], destIndx[0]);
+
+        console.log("leve - 2 data 🖍️🖍️🖍️", childrenList1, childrenList2);
+
+        const [sourcecloneChildren, destCloneChildren, copiedItem] = copy(
+          childrenList1,
+          childrenList2,
+          source,
+          destination,
+          setOpen
+        );
+        setCopiedItems({
+          destination: destCloneChildren,
+          item: copiedItem,
+          level: "level-2",
+        });
+        console.log("⌛⌛⌛", sourcecloneChildren, destCloneChildren, result);
+
+        const newChildrenList1 = updateObject(
+          state[0],
+          `1-level1__${dropId}`,
+          sourcecloneChildren,
+          result
+        );
+
+        const newChildrenList2 = updateObject(
+          state[1],
+          `2-level1__${dropId}`,
+          destCloneChildren,
+          result
+        );
+
+        console.log("✨", newChildrenList1);
+        console.log("🎉", newChildrenList2);
+
+        const LISTL1 = [...state];
+        LISTL1[0] = newChildrenList1;
+        LISTL1[1] = newChildrenList2;
+        setState(LISTL1);
+        return;
+      }
+
+      if (type === "level-3-res") {
+        console.log("type level 3", type);
+        console.log("🎉📜📃", sInd, dInd);
+        const sourceIndx = sInd.split("__");
+        const destIndx = dInd.split("__");
+        console.log("⚡", sourceIndx[1], "🔥", destIndx[1]);
+        if (sourceIndx[1] === destIndx[1]) {
+          console.log("🗾🗾🗾🗾");
+          return;
+        }
+        const nestedChildrenList1 = findChildrenThirdLevel(state[0], sInd);
+        const nestedChildrenList2 = findChildrenThirdLevel(state[1], dInd);
+
+        console.log("📃‼️‼️❓⁉️❓", nestedChildrenList1);
+        console.log("📜❓❓❓", nestedChildrenList2);
+
+        const [sourcecloneNestedChildren, destCloneNestedChildren, copiedItem] =
+          copy(
+            nestedChildrenList1,
+            nestedChildrenList2,
+            source,
+            destination,
+            setOpen
+          );
+        setCopiedItems({
+          destination: destCloneNestedChildren,
+          item: copiedItem,
+          level: "level-3-res",
+        });
+        const newNestedList1 = updateObjectThirdChildren(
+          state[0],
+          sInd,
+          sourcecloneNestedChildren
+        );
+        const newNestedList2 = updateObjectThirdChildren(
+          state[1],
+          dInd,
+          destCloneNestedChildren
+        );
+
+        const LISTL1 = [...state];
+        LISTL1[0] = newNestedList1;
+        LISTL1[1] = newNestedList2;
+        setState(LISTL1);
+        return;
+      }
+      if (type === "level-3-param") {
+        console.log("type level 3", type);
+        console.log("🎉📜📃", sInd, dInd);
+        const sourceIndx = sInd.split("__");
+        const destIndx = dInd.split("__");
+        console.log("⚡", sourceIndx[1], "🔥", destIndx[1]);
+        if (sourceIndx[1] === destIndx[1]) {
+          console.log("🗾🗾🗾🗾");
+          return;
+        }
+        const nestedChildrenList1 = findChildrenThirdLevel(state[0], sInd);
+        const nestedChildrenList2 = findChildrenThirdLevel(state[1], dInd);
+
+        console.log("", nestedChildrenList1);
+        console.log("📜❓❓❓", nestedChildrenList2);
+
+        const [sourcecloneNestedChildren, destCloneNestedChildren, copiedItem] =
+          copy(
+            nestedChildrenList1,
+            nestedChildrenList2,
+            source,
+            destination,
+            setOpen
+          );
+        setCopiedItems({
+          destination: destCloneNestedChildren,
+          item: copiedItem,
+          level: "level-3-param",
+        });
+        const newNestedList1 = updateObjectThirdChildren(
+          state[0],
+          sInd,
+          sourcecloneNestedChildren
+        );
+        const newNestedList2 = updateObjectThirdChildren(
+          state[1],
+          dInd,
+          destCloneNestedChildren
+        );
+
+        const LISTL1 = [...state];
+        LISTL1[0] = newNestedList1;
+        LISTL1[1] = newNestedList2;
+        setState(LISTL1);
+        return;
+      }
+    } else {
+      console.log("🚨🚨🚨", "else");
+      if (type === "level-1") {
+        const children = reorder(
+          state[1].children,
+          result.source.index,
+          result.destination.index
+        );
+
+        const list = {
+          ...state[1],
+          children,
+        };
+        console.log("🎁🎁🎁🎁", list);
+        console.log("🎀🎀🎀🎀", _.cloneDeep(state[0]));
+        const LIST = [...state];
+        LIST[0] = _.cloneDeep(state[0]);
+        LIST[1] = list;
+        setState(LIST);
+      } else if (type === "level-2") {
+        const findID = result.destination.droppableId.split("__");
+        const index = state[1].children.findIndex((item) => {
+          if (item.key === findID[0]) {
+            return true;
+          }
+          return false;
+        });
+        console.log("🌍🌍", index, result);
+        const nested = state[1].children.filter((item) =>
+          Object.prototype.hasOwnProperty.call(item, "children")
+        )[index];
+
+        console.log("🎗️🎗️🎗️🎗️", nested);
+
+        const updated = {
+          ...nested,
+          children: reorder(
+            nested.children,
+            result.source.index,
+            // $ExpectError - already checked for null
+            result.destination.index
+          ),
+        };
+
+        const nestedIndex = state[1].children.indexOf(nested);
+        const children = Array.from(state[1].children);
+        children[nestedIndex] = updated;
+
+        console.log("🎏🎏🎏🎏", children);
+
+        const List1 = {
+          ...state[1],
+          children,
+        };
+
+        const LIST1 = [...state];
+        LIST1[0] = _.cloneDeep(state[0]);
+        LIST1[1] = List1;
+        setState(LIST1);
+      } else if (type === "level-3-res" || "level-3-param") {
+        console.log("🎨🎨🎨", result);
+
+        const indx = findIndexInNestedArrayPnC(
+          state[1].children,
+          result.destination.droppableId
+        );
+        console.log("🦺🦺🦺", indx);
+        const nested = state[1].children.filter((item) =>
+          Object.prototype.hasOwnProperty.call(item, "children")
+        )[indx.parentIndex];
+
+        const thirdNested = nested.children.filter((item) =>
+          Object.prototype.hasOwnProperty.call(item, "children")
+        )[indx.childIndex];
+
+        console.log("✨✨✨🚩🌍", nested, thirdNested);
+
+        const updated = {
+          ...thirdNested,
+          children: reorder(
+            thirdNested.children,
+            result.source.index,
+            // $ExpectError - already checked for null
+            result.destination.index
+          ),
+        };
+
+        const thirdNestedIndex = nested.children.indexOf(thirdNested);
+        const nestedIndex = state[1].children.indexOf(nested);
+        const children1 = Array.from(nested.children);
+        children1[thirdNestedIndex] = updated;
+
+        const updated1 = {
+          ...nested,
+          children: children1,
+        };
+
+        const children = Array.from(state[1].children);
+        children[nestedIndex] = updated1;
+
+        const list2 = {
+          ...state[1],
+          children,
+        };
+
+        const LIST2 = [...state];
+        LIST2[0] = _.cloneDeep(state[0]);
+        LIST2[1] = list2;
+        setState(LIST2);
+      }
+
+      // else if (type === "level-3-res") {
+
+      // }
+    }
+  };
+
+  const handleUndo = () => {};
+
+  const handleSwap = () => {};
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Box
+        component={Paper}
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "4rem",
+          boxSizing: "border-box",
+          justifyContent: "center",
+          alignItems: "flex-start",
+        }}
+      >
+        {state.map((item, index) => (
+          <MuiTreeGragList
+            key={index}
+            list={item}
+            isDrop={index === 0 && true}
+            draggable={index === 3 && true}
+            onClickUndo={handleUndo}
+            onClickSwap={handleSwap}
+          />
+        ))}
+      </Box>
+    </DragDropContext>
+  );
 };
+
+// const Root = styled.div`
+//   background-color:"blue ;
+//   box-sizing: border-box;
+//   padding: 1rem;
+//   min-height: 100vh;
+//   overflow-y: auto;
+
+//   /* flexbox */
+//   display: flex;
+//   gap: 20px;
+//   justify-content: center;
+//   align-items: flex-start;
+// `;
+
+export default MuiTreeDndApp;

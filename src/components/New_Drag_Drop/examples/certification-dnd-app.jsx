@@ -538,13 +538,6 @@ const CertificationDndAPP = () => {
       setOpen(false);
       console.log("previous data Param🎗️", copiedItems.destination);
       console.log("OverWrite item in level-3-res Param 🔥", updatedArr);
-    } else {
-      const updatedArr = replaceElementByKeyAndTitle(
-        copiedItems.destination,
-        copiedItems.item,
-        setOverWriteData
-      );
-      setOpen(false);
     }
   };
 

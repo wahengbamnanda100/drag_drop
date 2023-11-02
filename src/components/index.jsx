@@ -34,6 +34,12 @@ function MainLayout() {
         <Button variant="outlined" onClick={() => navigate("/newnewdragdrop")}>
           New New Drag and drop
         </Button>
+        <Button variant="outlined" onClick={() => navigate("/muidragdrop")}>
+          MUI Tree Drag and drop
+        </Button>
+        <Button variant="outlined" onClick={() => navigate("/atlasdragdrop")}>
+          AtlasKit Tree Drag and drop
+        </Button>
       </Stack>
     </Container>
   );
