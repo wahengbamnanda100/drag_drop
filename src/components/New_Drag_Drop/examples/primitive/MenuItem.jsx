@@ -36,6 +36,7 @@ const Container = styled.a`
   margin-bottom: ${grid}px;
   user-select: none;
   postion: relative;
+  border-radius: 0.3rem;
 
   /* anchor overrides */
   color: ${colors.N900};
@@ -172,7 +173,7 @@ const MenuItem = (props) => {
         >
           {data?.subTitle.$ref}
         </Typography>
-        <Typography variant="subtitle2">{data.id}</Typography>
+        {/* <Typography variant="subtitle2">{data.id}</Typography> */}
         {/* <Footer>
           <Author colors={quote.author.colors}>{quote.author.name}</Author>
           <QuoteId>id:{quote.id}</QuoteId>
