@@ -21,6 +21,9 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
+import ListOutlinedIcon from "@mui/icons-material/ListOutlined";
+import AlignHorizontalRightOutlinedIcon from "@mui/icons-material/AlignHorizontalRightOutlined";
+import AlignVerticalCenterOutlinedIcon from "@mui/icons-material/AlignVerticalCenterOutlined";
 
 const NestedDragList = ({
   list,
@@ -72,7 +75,7 @@ const NestedDragList = ({
   ) => {
     const isOpen = openStates[list.id] || false;
     // const theme = useTheme();
-    // console.log("List data", list);
+    console.log("List data", list);
     return (
       <Droppable
         droppableId={list.id}
@@ -128,7 +131,8 @@ const NestedDragList = ({
               direction={"row"}
               alignItems={"center"}
               justifyContent={"start"}
-              spacing={1}
+              gap={"1rem"}
+              padding={"0.5rem"}
             >
               <IconButton onClick={() => handleExpandCollapse(list.id)}>
                 {isOpen ? (
@@ -137,7 +141,24 @@ const NestedDragList = ({
                   <ExpandMoreOutlinedIcon />
                 )}
               </IconButton>
-              <Box sx={{ width: "100%" }}>
+              {list.level_id.split("-")[0] === "paths" && (
+                <ListOutlinedIcon fontSize="medium" />
+              )}
+              {list.key === "responses" ? (
+                <AlignVerticalCenterOutlinedIcon />
+              ) : list.key === "parameters" ? (
+                <AlignHorizontalRightOutlinedIcon />
+              ) : (
+                ""
+              )}
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "2px",
+                }}
+              >
                 <Typography
                   variant="body1"
                   fontWeight={"medium"}
@@ -150,6 +171,26 @@ const NestedDragList = ({
                 >
                   {list.title}
                 </Typography>
+                {list.subTitle && (
+                  <Typography
+                    variant="caption"
+                    fontWeight={"medium"}
+                    sx={{
+                      whiteSpace: "pre-wrap",
+                      wordBreak: "break-word",
+                      width: "100%",
+                      pb: "10px",
+                    }}
+                  >
+                    {typeof list?.subTitle === "string"
+                      ? list?.subTitle
+                      : typeof list?.subTitle === "object"
+                      ? list?.subTitle.hasOwnProperty("$ref")
+                        ? list?.subTitle?.$ref
+                        : list?.subTitle?.summary
+                      : ""}
+                  </Typography>
+                )}
               </Box>
             </Stack>
             <Collapse in={isOpen} timeout="auto" unmountOnExit>
@@ -254,6 +295,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: ${grid}px;
+  // padding: 1rem;
   position: relative;
   padding-bottom: 0;
   user-select: none;
@@ -262,26 +304,6 @@ const Container = styled.div`
   border-radius: 0.4rem;
   box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.5);
   transition: background-color 0.1s ease;
-  // overflow-y: auto;
-
-  &:focus {
-    outline: 2px solid ${colors.P200};
-    outline-offset: 2px;
-  }
-`;
-
-const AccordionContainer = styled(Accordion)`
-  background-color: ${({ isDraggingOver }) =>
-    isDraggingOver ? colors.B50 : colors.B75};
-  display: flex;
-  flex-direction: column;
-  padding: ${grid}px;
-  position: relative;
-  padding-bottom: 0;
-  user-select: none;
-  overflow-x: hidden;
-  transition: background-color 0.1s ease;
-  // overflow-y: auto;
 
   &:focus {
     outline: 2px solid ${colors.P200};
@@ -291,6 +313,6 @@ const AccordionContainer = styled(Accordion)`
 
 const NestedContainer = styled(Container)`
   padding: 0;
-  margin-bottom: 6px;
+  margin-bottom: 0.5rem;
   // margin-left: 16px;
 `;
